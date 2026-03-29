@@ -130,5 +130,18 @@
     document.getElementById('live-temp').textContent = t
     document.getElementById('baseline-temp').textContent = t
   }).catch(function() { /* silently use hardcoded fallbacks */ })
+
+  // Show "Go to Dashboard" if user has already registered
+  var myId = localStorage.getItem('heatsafe_my_id')
+  var caredFor = JSON.parse(localStorage.getItem('heatsafe_cared_for') || '[]')
+  if (myId || caredFor.length > 0) {
+    var banner = document.createElement('div')
+    banner.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:50;background:#fff;border:2px solid #e23235;border-radius:9999px;padding:12px 28px;box-shadow:0 8px 30px rgba(44,42,41,0.12);display:flex;align-items:center;gap:12px;white-space:nowrap;'
+    banner.innerHTML =
+      '<span class="material-symbols-outlined" style="color:#e23235;font-size:20px">dashboard</span>' +
+      '<span style="font-family:Outfit,sans-serif;font-size:15px;font-weight:500;color:#2C2A29">Welcome back</span>' +
+      '<a href="dashboard/index.html" style="font-family:Outfit,sans-serif;font-size:15px;font-weight:700;color:#fff;background:#e23235;border-radius:9999px;padding:6px 18px;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background=\'#c41e21\'" onmouseout="this.style.background=\'#e23235\'">Go to Dashboard</a>'
+    document.body.appendChild(banner)
+  }
 </script>
 </body></html>

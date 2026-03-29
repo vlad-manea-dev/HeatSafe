@@ -187,6 +187,39 @@ tailwind.config = {
   var params = new URLSearchParams(window.location.search)
   var personId = params.get('id') || 'aaaaaaaa-0000-0000-0000-000000000001'
 
+  // Pre-populate name immediately from localStorage if this is the logged-in user
+  var myId = localStorage.getItem('heatsafe_my_id')
+  var myName = localStorage.getItem('heatsafe_my_name')
+  if (myId && personId === myId && myName) {
+    var nameEl = document.getElementById('person-name')
+    if (nameEl) nameEl.textContent = myName
+  }
+
+  // Show delete button if this person is in heatsafe_cared_for (not a demo user or self)
+  var demoPeople = ['aaaaaaaa-0000-0000-0000-000000000001', 'aaaaaaaa-0000-0000-0000-000000000002']
+  var caredFor = JSON.parse(localStorage.getItem('heatsafe_cared_for') || '[]')
+  var isCaredFor = caredFor.some(function(p) { return p.id === personId })
+
+  if (isCaredFor && demoPeople.indexOf(personId) === -1) {
+    var deleteBtn = document.createElement('button')
+    deleteBtn.title = 'Remove from care list'
+    deleteBtn.style.cssText = 'display:flex;align-items:center;gap:6px;padding:8px 16px;border:1px solid #fca5a5;border-radius:8px;background:#fff5f5;color:#dc2626;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.2s;'
+    deleteBtn.onmouseover = function() { this.style.background = '#fee2e2'; this.style.borderColor = '#dc2626' }
+    deleteBtn.onmouseout = function() { this.style.background = '#fff5f5'; this.style.borderColor = '#fca5a5' }
+    deleteBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px">delete</span> Remove from care list'
+    deleteBtn.onclick = function() {
+      var personNameEl = document.getElementById('person-name')
+      var personName = personNameEl ? personNameEl.textContent : 'this person'
+      if (confirm('Remove ' + personName + ' from your care list?')) {
+        var updated = caredFor.filter(function(p) { return p.id !== personId })
+        localStorage.setItem('heatsafe_cared_for', JSON.stringify(updated))
+        window.location.href = '../index.html'
+      }
+    }
+    var header = document.querySelector('header')
+    if (header) header.appendChild(deleteBtn)
+  }
+
   fetchPerson(personId).then(function(data) {
     // Name and location
     var nameEl = document.getElementById('person-name')
