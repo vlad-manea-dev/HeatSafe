@@ -1,0 +1,545 @@
+<!-- Enterprise Planning Map View -->
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HeatSafe - Enterprise Planning</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Outfit:wght@400;500&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#D9383A",
+                        "background-light": "#FDFBF7",
+                        "background-dark": "#211112",
+                        "surface": "#FFFFFF",
+                        "text-main": "#2C2A29",
+                        "muted": "#8A8683",
+                        "border-color": "#EAE6E1",
+                        "risk-amber": "#E76F51",
+                        "safe-sage": "#4A7C59",
+                        "enterprise-blue": "#2563EB"
+                    },
+                    fontFamily: {
+                        "display": ["Fraunces", "serif"],
+                        "body": ["Outfit", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                    boxShadow: {
+                        'soft': '0 8px 30px rgba(44, 42, 41, 0.04)',
+                        'floating': '0 4px 24px rgba(0, 0, 0, 0.08)'
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Outfit', sans-serif; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Fraunces', serif; }
+
+        .leaflet-container img { max-width: none !important; }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            background: #e8e0d8;
+        }
+
+        .layer-toggle.active { background-color: #2563EB; }
+        .layer-toggle { transition: background-color 0.2s; }
+        
+        .simulation-mode {
+            cursor: crosshair !important;
+        }
+
+        /* Virtual Park Marker */
+        .virtual-park-marker {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #4A7C59;
+            border: 3px solid white;
+            box-shadow: 0 0 15px rgba(74, 124, 89, 0.8);
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(74, 124, 89, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(74, 124, 89, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(74, 124, 89, 0); }
+        }
+        
+        /* Bivariate Hexbin Tooltip */
+        .hex-tooltip {
+            background: #FFFFFF;
+            border: 1px solid #EAE6E1;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 10px 14px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            color: #2C2A29;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-background-light text-text-main h-screen w-full overflow-hidden flex flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-border-color px-10 py-3 bg-surface z-50 relative shadow-sm">
+<div class="flex items-center gap-4 text-text-main">
+<div class="size-6 text-enterprise-blue">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">domain</span>
+</div>
+<a href="../index.html"><h2 class="text-text-main text-xl font-bold leading-tight tracking-[-0.015em] font-display">HeatSafe <span class="text-enterprise-blue text-sm font-body font-medium ml-2">Enterprise</span></h2></a>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<div class="flex items-center gap-9">
+<a class="text-muted hover:text-text-main transition-colors text-sm font-medium leading-normal" href="../dashboard/index.html">Dashboard</a>
+<a class="text-muted hover:text-text-main transition-colors text-sm font-medium leading-normal" href="../city/index.html">Map View</a>
+<a class="text-enterprise-blue text-sm font-medium leading-normal border-b-2 border-enterprise-blue pb-1 flex items-center gap-1" href="index.html"><span class="material-symbols-outlined text-[18px]">domain</span> Enterprise</a>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 bg-border-color flex items-center justify-center text-muted">
+<span class="material-symbols-outlined">person</span>
+</div>
+</div>
+</header>
+<main class="flex-1 relative flex overflow-hidden">
+<aside class="absolute left-6 top-6 bottom-6 w-[360px] bg-surface rounded-lg shadow-floating z-40 flex flex-col overflow-hidden border border-border-color">
+<div class="p-6 border-b border-border-color">
+<div class="flex items-center justify-between mb-2">
+<h1 class="font-display text-2xl font-semibold">Urban Planning</h1>
+<select id="city-selector" class="text-xs font-semibold bg-background-light border border-border-color rounded px-2 py-1 focus:ring-enterprise-blue">
+<option value="sevilla">Sevilla</option>
+<option value="madrid">Madrid</option>
+<option value="barcelona">Barcelona</option>
+<option value="valencia">Valencia</option>
+</select>
+</div>
+<p class="text-muted text-sm mb-6">Simulate interventions and analyze bivariate vulnerability indices.</p>
+
+<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-2">
+    <h3 class="font-semibold text-enterprise-blue text-sm flex items-center gap-2 mb-2">
+        <span class="material-symbols-outlined text-[18px]">park</span> What-If Simulator
+    </h3>
+    <p class="text-xs text-text-main opacity-80 mb-3">Draw a virtual green space to simulate cooling radius and ROI.</p>
+    <button id="sim-btn" class="w-full bg-enterprise-blue text-white rounded py-2 text-sm font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-[16px]">add_location</span>
+        Add Virtual Park (-3.5°C Offset)
+    </button>
+    <button id="clear-sim-btn" class="w-full mt-2 border border-enterprise-blue text-enterprise-blue rounded py-2 text-sm font-medium hover:bg-blue-50 transition-colors hidden">
+        Clear Simulations
+    </button>
+</div>
+
+</div>
+
+<div class="p-6 flex-1 overflow-y-auto">
+    <h3 class="font-medium text-sm text-muted uppercase tracking-wider mb-4">Projected ROI Metrics</h3>
+    <div class="space-y-4 mb-8">
+        <div class="flex justify-between items-center border-b border-border-color pb-2">
+            <span class="text-sm text-text-main">Avg. Temp Reduction</span>
+            <span id="roi-temp" class="font-bold text-safe-sage">0.0°C</span>
+        </div>
+        <div class="flex justify-between items-center border-b border-border-color pb-2">
+            <span class="text-sm text-text-main">High-Risk Residents Secured</span>
+            <span id="roi-people" class="font-bold text-safe-sage">0</span>
+        </div>
+        <div class="flex justify-between items-center border-b border-border-color pb-2">
+            <span class="text-sm text-text-main">Est. Annual Healthcare Savings</span>
+            <span id="roi-savings" class="font-bold text-safe-sage">€0</span>
+        </div>
+    </div>
+
+<h3 class="font-medium text-sm text-muted uppercase tracking-wider mb-4">Enterprise Layers</h3>
+<div class="flex items-center justify-between mb-4">
+<span class="text-sm font-medium">Thermal Surface (IDW)</span>
+<button id="toggle-surface" class="layer-toggle active w-10 h-6 rounded-full relative bg-enterprise-blue">
+<div class="w-4 h-4 bg-surface rounded-full absolute right-1 top-1 shadow-sm"></div>
+</button>
+</div>
+<div class="flex items-center justify-between mb-4">
+<span class="text-sm font-medium">Vulnerability Hexbins</span>
+<button id="toggle-hex" class="layer-toggle w-10 h-6 rounded-full relative bg-[#8A8683]">
+<div class="w-4 h-4 bg-surface rounded-full absolute left-1 top-1 shadow-sm"></div>
+</button>
+</div>
+<div class="mb-4 pl-2 border-l-2 border-border-color text-xs text-muted">
+    Bivariate map: Heat severity × Population density. Dark purple indicates urgent intervention zones.
+</div>
+<div class="flex items-center justify-between mb-4">
+<span class="text-sm font-medium">Satellite Base (NDVI Proxy)</span>
+<button id="toggle-sat" class="layer-toggle w-10 h-6 rounded-full relative bg-[#8A8683]">
+<div class="w-4 h-4 bg-surface rounded-full absolute left-1 top-1 shadow-sm"></div>
+</button>
+</div>
+</div>
+<div class="p-4 border-t border-border-color bg-background-light text-center">
+<p id="last-updated" class="text-xs text-muted">Loading...</p>
+</div>
+</aside>
+<div class="flex-1 relative z-0 w-full h-full">
+<div id="map"></div>
+<div id="sim-toast" class="absolute top-6 left-1/2 transform -translate-x-1/2 bg-surface border border-enterprise-blue text-enterprise-blue px-6 py-3 rounded-full shadow-floating font-medium text-sm z-[1000] hidden transition-all duration-300 translate-y-[-20px] opacity-0">
+    Click anywhere on the map to place a Virtual Park
+</div>
+</div>
+</main>
+
+<script>
+  const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:3000'
+    : window.location.origin
+
+  // State
+  let allData = null
+  let currentHour = 15 // Peak heat at 3PM for simulation
+  let virtualNodes = [] // Array of simulated parks
+  let originalRiskCount = 0
+  let isSimulating = false
+
+  // Map Setup
+  const map = L.map('map', { zoomControl: false }).setView([37.385, -5.990], 13)
+
+  // Base Layers
+  const lightTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; CARTO', subdomains: 'abcd', maxZoom: 19
+  }).addTo(map)
+
+  const satTiles = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+    maxZoom: 19
+  })
+
+  // Data Layers
+  const heatSurfaceLayer = L.layerGroup().addTo(map)
+  const hexLayer = L.layerGroup()
+  const virtualLayer = L.layerGroup().addTo(map)
+
+  // IDW Thermal Surface
+  const HeatSurface = L.Layer.extend({
+    onAdd: function(map) {
+      this._container = L.DomUtil.create('canvas', 'leaflet-zoom-animated')
+      this._container.style.opacity = '0.55'
+      this._container.style.pointerEvents = 'none'
+      this._container.style.zIndex = '1'
+      map.getPanes().overlayPane.appendChild(this._container)
+      map.on('viewreset', this._reset, this)
+      map.on('moveend', this._reset, this)
+      this._reset()
+    },
+    onRemove: function(map) {
+      map.getPanes().overlayPane.removeChild(this._container)
+      map.off('viewreset', this._reset, this)
+      map.off('moveend', this._reset, this)
+    },
+    _reset: function() {
+      const size = map.getSize()
+      this._container.width = size.x
+      this._container.height = size.y
+      L.DomUtil.setPosition(this._container, map.containerPointToLayerPoint([0, 0]))
+      this._draw()
+    },
+    _draw: function() {
+      if (!allData || !allData.zones) return
+      const ctx = this._container.getContext('2d')
+      const size = map.getSize()
+      ctx.clearRect(0, 0, size.x, size.y)
+      const step = 20 // High resolution for enterprise
+      
+      for (let x = 0; x < size.x; x += step) {
+        for (let y = 0; y < size.y; y += step) {
+          const latlng = map.containerPointToLatLng([x + step/2, y + step/2])
+          const temp = getTempAt(latlng.lat, latlng.lng, currentHour)
+          ctx.fillStyle = tempToColor(temp)
+          ctx.fillRect(x, y, step, step)
+        }
+      }
+    }
+  })
+
+  const heatSurface = new HeatSurface()
+  heatSurface.addTo(heatSurfaceLayer)
+
+  // Temperature Math
+  function getTempAt(lat, lng, hour, excludeVirtual = false) {
+    if (!allData || !allData.zones) return 0
+    const baselineHour = allData.hourly[hour] || { temp: 30 }
+    const baseTemp = baselineHour.temp
+
+    let numerator = 0
+    let denominator = 0
+    const p = 2 
+
+    const nodes = excludeVirtual ? allData.zones : [...allData.zones, ...virtualNodes]
+
+    nodes.forEach((z) => {
+      const dist = Math.sqrt(Math.pow(lat - z.centroid.lat, 2) + Math.pow(lng - z.centroid.lng, 2))
+      if (dist === 0) return baseTemp + z.offset
+      const weight = 1 / Math.pow(dist, p)
+      numerator += (baseTemp + z.offset) * weight
+      denominator += weight
+    })
+
+    return denominator === 0 ? baseTemp : numerator / denominator
+  }
+
+  function tempToColor(temp) {
+    if (temp >= 42) return '#991B1B' // Darker red for enterprise
+    if (temp >= 38) return '#DC2626'
+    if (temp >= 34) return '#EA580C'
+    if (temp >= 28) return '#FBBF24'
+    return '#15803D' // Green
+  }
+
+  // Bivariate Hexbins using Turf.js
+  function generateHexbins() {
+    hexLayer.clearLayers()
+    if (!allData || !allData.users) return
+
+    const bounds = map.getBounds()
+    const bbox = [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()]
+    const cellSide = 0.5 // kilometers
+    const options = {units: 'kilometers'}
+    
+    // Generate hex grid
+    const hexgrid = turf.hexGrid(bbox, cellSide, options)
+
+    // Calculate vulnerability per hex
+    hexgrid.features.forEach(feature => {
+      let userCount = 0
+      const center = turf.centerOfMass(feature).geometry.coordinates
+      const temp = getTempAt(center[1], center[0], currentHour)
+      
+      // Count vulnerable users in this hex (mocked by distance for demo)
+      allData.users.forEach(u => {
+        const d = Math.sqrt(Math.pow(u.lat - center[1], 2) + Math.pow(u.lng - center[0], 2))
+        if (d < 0.005) userCount++
+      })
+
+      // Bivariate logic: Heat vs Density
+      // High Heat (>35) + High Density (>0) = Urgent
+      let color = 'transparent'
+      let weight = 0
+      let fillOpacity = 0
+      let label = ''
+
+      if (temp > 35 && userCount > 0) {
+        color = '#4C1D95' // Deep purple for critical intervention
+        fillOpacity = 0.6
+        weight = 1
+        label = 'Urgent: High Heat & High Vulnerability'
+      } else if (temp > 35) {
+        color = '#DC2626' // Red for heat only
+        fillOpacity = 0.3
+        weight = 1
+        label = 'Hotspot (Low resident density)'
+      } else if (userCount > 0) {
+        color = '#2563EB' // Blue for density, ok heat
+        fillOpacity = 0.3
+        weight = 1
+        label = 'High Density (Safe temp)'
+      }
+
+      if (color !== 'transparent') {
+        const poly = L.geoJSON(feature, {
+          style: { color: color, fillColor: color, weight: weight, fillOpacity: fillOpacity }
+        })
+        
+        poly.bindTooltip(`
+          <div class="font-display font-semibold mb-1">${label}</div>
+          <div class="text-xs">Est. Peak Temp: ${temp.toFixed(1)}°C</div>
+          <div class="text-xs">Vulnerable Residents: ${userCount * 10}</div> <!-- Multiplier for enterprise scale illusion -->
+        `, {className: 'hex-tooltip'})
+        
+        poly.addTo(hexLayer)
+      }
+    })
+  }
+
+  // ROI Calculations
+  function calculateROI() {
+    if (virtualNodes.length === 0) {
+        document.getElementById('roi-temp').textContent = '0.0°C'
+        document.getElementById('roi-people').textContent = '0'
+        document.getElementById('roi-savings').textContent = '€0'
+        return
+    }
+
+    let tempReductions = []
+    let securedCount = 0
+
+    allData.users.forEach(u => {
+        const tempBefore = getTempAt(u.lat, u.lng, currentHour, true)
+        const tempAfter = getTempAt(u.lat, u.lng, currentHour, false)
+        const diff = tempBefore - tempAfter
+        
+        if (diff > 0.1) tempReductions.push(diff)
+        
+        // If they were above dangerous threshold (35) and dropped below it
+        if (tempBefore >= 35 && tempAfter < 35) {
+            securedCount += 10 // Enterprise multiplier
+        }
+    })
+
+    const avgReduction = tempReductions.length > 0 
+        ? (tempReductions.reduce((a,b)=>a+b,0) / tempReductions.length).toFixed(1) 
+        : 0.0
+
+    // Economic proxy: €1500 saved per person secured per year
+    const savings = securedCount * 1500
+
+    document.getElementById('roi-temp').textContent = `-${avgReduction}°C`
+    document.getElementById('roi-people').textContent = securedCount
+    document.getElementById('roi-savings').textContent = `€${savings.toLocaleString()}`
+  }
+
+  // Map Click for Simulator
+  map.on('click', function(e) {
+      if (!isSimulating) return
+      
+      const newPark = {
+          zoneId: `virtual-${Date.now()}`,
+          centroid: { lat: e.latlng.lat, lng: e.latlng.lng },
+          offset: -3.5, // Strong cooling effect
+      }
+      
+      virtualNodes.push(newPark)
+      
+      // Add marker
+      const icon = L.divIcon({ className: 'virtual-park-marker', iconSize: [20,20] })
+      L.marker([e.latlng.lat, e.latlng.lng], {icon}).addTo(virtualLayer)
+      
+      // Redraw everything
+      if (heatSurface && heatSurface._draw) heatSurface._draw()
+      generateHexbins()
+      calculateROI()
+      
+      // Reset tool
+      isSimulating = false
+      document.getElementById('map').classList.remove('simulation-mode')
+      
+      const toast = document.getElementById('sim-toast')
+      toast.style.opacity = '0'
+      toast.style.transform = 'translate(-50%, -20px)'
+      setTimeout(() => toast.classList.add('hidden'), 300)
+      
+      document.getElementById('clear-sim-btn').classList.remove('hidden')
+  })
+
+  // Setup UI Listeners
+  document.getElementById('sim-btn').addEventListener('click', () => {
+      isSimulating = true
+      document.getElementById('map').classList.add('simulation-mode')
+      
+      const toast = document.getElementById('sim-toast')
+      toast.classList.remove('hidden')
+      // small delay to allow display block to apply before transition
+      setTimeout(() => {
+          toast.style.opacity = '1'
+          toast.style.transform = 'translate(-50%, 0)'
+      }, 10)
+  })
+
+  document.getElementById('clear-sim-btn').addEventListener('click', () => {
+      virtualNodes = []
+      virtualLayer.clearLayers()
+      if (heatSurface && heatSurface._draw) heatSurface._draw()
+      generateHexbins()
+      calculateROI()
+      document.getElementById('clear-sim-btn').classList.add('hidden')
+  })
+
+  // Toggles
+  let surfaceVisible = true
+  let hexVisible = false
+  let satVisible = false
+
+  document.getElementById('toggle-surface').addEventListener('click', function() {
+      surfaceVisible = !surfaceVisible
+      this.classList.toggle('active', surfaceVisible)
+      this.style.backgroundColor = surfaceVisible ? '#2563EB' : '#8A8683'
+      this.querySelector('div').style.right = surfaceVisible ? '4px' : 'auto'
+      this.querySelector('div').style.left = surfaceVisible ? 'auto' : '4px'
+      if (surfaceVisible) heatSurfaceLayer.addTo(map)
+      else map.removeLayer(heatSurfaceLayer)
+  })
+
+  document.getElementById('toggle-hex').addEventListener('click', function() {
+      hexVisible = !hexVisible
+      this.classList.toggle('active', hexVisible)
+      this.style.backgroundColor = hexVisible ? '#2563EB' : '#8A8683'
+      this.querySelector('div').style.right = hexVisible ? '4px' : 'auto'
+      this.querySelector('div').style.left = hexVisible ? 'auto' : '4px'
+      if (hexVisible) {
+          hexLayer.addTo(map)
+          generateHexbins()
+      }
+      else map.removeLayer(hexLayer)
+  })
+
+  document.getElementById('toggle-sat').addEventListener('click', function() {
+      satVisible = !satVisible
+      this.classList.toggle('active', satVisible)
+      this.style.backgroundColor = satVisible ? '#2563EB' : '#8A8683'
+      this.querySelector('div').style.right = satVisible ? '4px' : 'auto'
+      this.querySelector('div').style.left = satVisible ? 'auto' : '4px'
+      
+      if (satVisible) {
+          map.removeLayer(lightTiles)
+          satTiles.addTo(map)
+          heatSurfaceCanvas.getContainer().style.opacity = '0.7' // Increase visibility over dark satellite
+      } else {
+          map.removeLayer(satTiles)
+          lightTiles.addTo(map)
+          heatSurfaceCanvas.getContainer().style.opacity = '0.55'
+      }
+      // Re-add surface so it sits on top
+      if (surfaceVisible) {
+          map.removeLayer(heatSurfaceLayer)
+          heatSurfaceLayer.addTo(map)
+      }
+  })
+
+  async function loadZones(city = 'sevilla') {
+    try {
+      virtualNodes = []
+      virtualLayer.clearLayers()
+      document.getElementById('clear-sim-btn').classList.add('hidden')
+      calculateROI()
+
+      const url = `${API_BASE}/api/zones?city=${city}`
+      const res = await fetch(url)
+      allData = await res.json()
+
+      if (allData.error) throw new Error(allData.error);
+
+      if (allData.centroid) {
+        map.setView([allData.centroid.lat, allData.centroid.lng], 13)
+      }
+
+      if (heatSurface && heatSurface._draw) heatSurface._draw()
+      if (hexVisible) generateHexbins()
+
+      const now = new Date()
+      document.getElementById('last-updated').innerHTML = `<span class="inline-flex items-center gap-1 text-enterprise-blue font-bold"><span class="material-symbols-outlined text-[14px]">verified</span> ENTERPRISE API</span>`
+
+    } catch (err) {
+      console.error('Failed to load zones:', err)
+      document.getElementById('last-updated').textContent = 'API Connection Error'
+    }
+  }
+
+  document.getElementById('city-selector').addEventListener('change', function(e) {
+    loadZones(e.target.value)
+  })
+
+  // Start
+  loadZones()
+</script>
+</body></html>
