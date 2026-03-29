@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>HeatSafe - Registration Form</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e23235",
+                        "background-light": "#f8f6f6",
+                        "text-main": "#2C2A29",
+                        "text-muted": "#8A8683",
+                        "border-muted": "#EAE6E1",
+                        "surface": "#FFFFFF",
+                        "accent-blue": "#3b82f6",
+                        "accent-green": "#22c55e"
+                    },
+                    fontFamily: {
+                        "body": ["Inter", "sans-serif"],
+                    },
+                    boxShadow: {
+                        'soft': '0 8px 30px rgba(44, 42, 41, 0.04)',
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: theme('colors.background-light'); color: theme('colors.text-main'); }
+        .pill-base { padding: 6px 16px; border-radius: 9999px; border-width: 1px; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-block; margin-right: 8px; margin-bottom: 12px; transition: all 0.2s; }
+        .pill-unselected { background-color: theme('colors.surface'); border-color: theme('colors.border-muted'); color: theme('colors.text-muted'); }
+        .pill-unselected:hover { background-color: #f3f4f6; color: theme('colors.text-main'); border-color: #d1d5db; }
+        
+        .grid-input { background-color: #faf9f9; border: 1px solid theme('colors.border-muted'); color: theme('colors.text-main'); border-radius: 8px; padding: 12px 14px; font-size: 15px; width: 100%; outline: none; transition: all 0.2s; }
+        .grid-input:focus { border-color: theme('colors.primary'); box-shadow: 0 0 0 3px rgba(226,50,53,0.1); background-color: #fff; }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f8f6f6; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+    </style>
+</head>
+<body class="min-h-screen py-8 px-4 md:px-10 max-w-[1300px] mx-auto flex flex-col">
+    <div class="mb-10 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <img src="../assets/logo.png" alt="HeatSafe Logo" class="h-12 object-contain mix-blend-multiply" />
+            <span class="text-border-muted text-3xl font-light">|</span>
+            <h1 class="text-[22px] font-bold tracking-tight text-text-main">Registration</h1>
+        </div>
+        <a href="index.html" class="flex items-center text-text-muted hover:text-primary transition-colors text-sm font-bold bg-white px-4 py-2 rounded-full shadow-sm border border-border-muted/50">
+            <span class="material-symbols-outlined text-[18px] mr-1">close</span> Cancel
+        </a>
+    </div>
+
+    <!-- 3 Column Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch flex-1">
+        
+        <!-- Column 1: About you -->
+        <div class="bg-surface rounded-2xl p-8 flex flex-col shadow-soft border border-border-muted/60 transition-transform hover:-translate-y-1 duration-300">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-base font-bold text-primary border border-primary/20">1</div>
+                <h2 class="text-2xl font-bold">About you</h2>
+            </div>
+            
+            <div class="space-y-5 flex-1">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-text-muted text-sm font-bold uppercase tracking-wide">Name</label>
+                    <input type="text" class="grid-input" value="Mary O'Brien" />
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-text-muted text-sm font-bold uppercase tracking-wide">Date of birth</label>
+                    <input type="text" class="grid-input" value="12 / 03 / 1941" />
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-text-muted text-sm font-bold uppercase tracking-wide">Address</label>
+                    <textarea class="grid-input resize-none py-3" rows="3">14 Pearse St,&#10;Dublin 2</textarea>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-text-muted text-sm font-bold uppercase tracking-wide">Phone (SMS)</label>
+                    <input type="text" class="grid-input" value="+353 87 123 4567" />
+                </div>
+            </div>
+
+            <div class="mt-8 space-y-4 pt-8 border-t border-border-muted/60">
+                <label class="flex items-center gap-3 cursor-pointer group">
+                    <div class="w-6 h-6 rounded-md border-2 border-primary bg-primary flex items-center justify-center shadow-sm">
+                        <span class="material-symbols-outlined text-[18px] text-white font-bold">check</span>
+                    </div>
+                    <span class="text-text-main font-bold text-[15px]">I live alone</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer group">
+                    <div class="w-6 h-6 rounded-md border-2 border-border-muted bg-[#faf9f9] group-hover:border-primary/50 transition-colors"></div>
+                    <span class="text-text-muted group-hover:text-text-main font-medium text-[15px] transition-colors">Top floor apartment</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer group">
+                    <div class="w-6 h-6 rounded-md border-2 border-border-muted bg-[#faf9f9] group-hover:border-primary/50 transition-colors"></div>
+                    <span class="text-text-muted group-hover:text-text-main font-medium text-[15px] transition-colors">South-facing windows</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer group">
+                    <div class="w-6 h-6 rounded-md border-2 border-border-muted bg-[#faf9f9] group-hover:border-primary/50 transition-colors"></div>
+                    <span class="text-text-muted group-hover:text-text-main font-medium text-[15px] transition-colors">No air conditioning</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Column 2: Medications -->
+        <div class="bg-surface rounded-2xl p-8 flex flex-col shadow-soft border border-border-muted/60 transition-transform hover:-translate-y-1 duration-300">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-base font-bold text-accent-blue border border-blue-100">2</div>
+                <h2 class="text-2xl font-bold">Medications</h2>
+            </div>
+            
+            <div class="mb-6">
+                <h3 class="text-text-muted text-xs font-bold tracking-widest uppercase mb-2">Your Current Medications</h3>
+                <p class="text-text-main text-[15px] mb-5 leading-relaxed">Tap any that apply. We only use this to calculate heat risk.</p>
+                
+                <div class="flex flex-wrap">
+                    <div class="pill-base bg-amber-50 border-amber-300 text-amber-800 shadow-sm">Beta-blockers</div>
+                    <div class="pill-base bg-red-50 border-red-300 text-red-800 shadow-sm">Loop diuretics</div>
+                    <div class="pill-base pill-unselected">ACE inhibitors</div>
+                    <div class="pill-base pill-unselected">Anticholinergics</div>
+                    <div class="pill-base pill-unselected">Antipsychotics</div>
+                    <div class="pill-base pill-unselected">SSRIs</div>
+                </div>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-8 shadow-sm">
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-amber-600">warning</span>
+                    <p class="text-amber-800 text-[14.5px] leading-relaxed font-medium">
+                        Loop diuretics increase heat hospitalisation risk by <span class="font-bold">1.84×</span>. Beta-blockers reduce skin blood flow. These will be factored into your daily score.
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-auto">
+                <label class="block text-text-muted text-sm font-bold uppercase tracking-wide mb-2">Other medications</label>
+                <input type="text" class="grid-input" placeholder="Type a medication name..." />
+            </div>
+        </div>
+
+        <!-- Column 3: Emergency contacts -->
+        <div class="bg-surface rounded-2xl p-8 flex flex-col shadow-soft border border-border-muted/60 transition-transform hover:-translate-y-1 duration-300">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-base font-bold text-accent-blue border border-blue-100">3</div>
+                <h2 class="text-2xl font-bold">Emergency contacts</h2>
+            </div>
+
+            <p class="text-text-main text-[15px] mb-8 leading-relaxed">
+                Who should we alert if your heat risk is critical? They'll receive a text.
+            </p>
+
+            <div class="bg-[#faf9f9] rounded-xl p-5 border border-border-muted mb-6 group relative shadow-sm">
+                <h4 class="font-bold text-[18px] mb-1 text-text-main">Aoife O'Brien</h4>
+                <p class="text-text-muted text-[15px] mb-4 font-medium">+353 86 987 6543</p>
+                <div class="flex items-start gap-2 flex-col xl:flex-row xl:items-center">
+                    <span class="bg-blue-100 text-blue-800 px-2.5 py-1 rounded text-xs font-bold uppercase tracking-widest border border-blue-200">Daughter</span>
+                    <p class="text-text-main text-sm font-medium">Daily summary + critical</p>
+                </div>
+            </div>
+
+            <button class="w-full py-3.5 rounded-xl border-2 border-dashed border-border-muted hover:border-primary hover:bg-primary/5 transition-all text-text-muted hover:text-primary font-bold text-[15px] mb-10 flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-[20px]">add</span> Add another contact
+            </button>
+
+            <div class="mt-auto pt-8 border-t border-border-muted/60">
+                <h3 class="text-text-muted text-xs font-bold tracking-widest uppercase mb-6">Alert Preferences</h3>
+                
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <span class="text-text-main font-bold text-[15px]">SMS alerts to me</span>
+                        <button type="button" class="relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-accent-green transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 shadow-sm">
+                            <span class="translate-x-5 pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-text-main font-bold text-[15px]">Daily morning summary</span>
+                        <button type="button" class="relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-accent-green transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 shadow-sm">
+                            <span class="translate-x-5 pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between pt-2">
+                        <span class="text-text-main font-bold text-[15px]">Carer alerts threshold</span>
+                        <div class="flex bg-[#faf9f9] rounded-full p-1 border border-border-muted shadow-inner">
+                            <button class="px-4 py-1.5 text-xs font-bold rounded-full text-text-muted hover:text-text-main transition-colors">All</button>
+                            <button class="px-4 py-1.5 text-xs font-bold rounded-full bg-amber-100 text-amber-800 shadow-sm border border-amber-200/50">High risk</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Submit Circle -->
+    <div class="flex justify-center mt-10 mb-6 pb-12">
+        <a href="../dashboard/index.html" class="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white hover:bg-red-700 transition-all cursor-pointer group shadow-lg hover:shadow-xl hover:-translate-y-1">
+            <span class="material-symbols-outlined text-[32px] group-hover:translate-y-1 transition-transform">arrow_forward</span>
+        </a>
+    </div>
+</body>
+</html>
