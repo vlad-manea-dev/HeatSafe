@@ -1,0 +1,235 @@
+<!-- City Map View -->
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HeatSafe - City Map View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&amp;family=Outfit:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#D9383A",
+                        "background-light": "#FDFBF7",
+                        "background-dark": "#211112",
+                        "surface": "#FFFFFF",
+                        "text-main": "#2C2A29",
+                        "muted": "#8A8683",
+                        "border-color": "#EAE6E1",
+                        "risk-amber": "#E76F51",
+                        "safe-sage": "#4A7C59",
+                    },
+                    fontFamily: {
+                        "display": ["Fraunces", "serif"],
+                        "body": ["Outfit", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                    boxShadow: {
+                        'soft': '0 8px 30px rgba(44, 42, 41, 0.04)',
+                        'floating': '0 4px 24px rgba(0, 0, 0, 0.08)'
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Outfit', sans-serif; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Fraunces', serif; }
+        
+        .map-bg {
+            background-color: #e5e5e5;
+            background-image: radial-gradient(#d4d4d4 1px, transparent 1px);
+            background-size: 20px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .geo-polygon-sage {
+            background-color: rgba(74, 124, 89, 0.3);
+            border: 2px solid #4A7C59;
+        }
+        
+        .geo-polygon-amber {
+            background-color: rgba(231, 111, 81, 0.3);
+            border: 2px solid #E76F51;
+        }
+        
+        .geo-polygon-red {
+            background-color: rgba(217, 56, 58, 0.3);
+            border: 2px solid #D9383A;
+        }
+
+        .user-pin {
+            width: 12px;
+            height: 12px;
+            background-color: #2C2A29;
+            border-radius: 50%;
+            border: 2px solid #FFFFFF;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            position: absolute;
+            transform: translate(-50%, -50%);
+        }
+
+        .tooltip-hover:hover .tooltip-content {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body class="bg-background-light text-text-main h-screen w-full overflow-hidden flex flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-border-color px-10 py-3 bg-surface z-50 relative shadow-sm">
+<div class="flex items-center gap-4 text-text-main">
+<div class="size-6 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">thermostat</span>
+</div>
+<a href="../index.html"><h2 class="text-text-main text-xl font-bold leading-tight tracking-[-0.015em] font-display">HeatSafe</h2></a>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<div class="flex items-center gap-9">
+<a class="text-muted hover:text-text-main transition-colors text-sm font-medium leading-normal" href="../dashboard/index.html">Dashboard</a>
+<a class="text-primary text-sm font-medium leading-normal border-b-2 border-primary pb-1" href="index.html">Map View</a>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 bg-border-color flex items-center justify-center text-muted">
+<span class="material-symbols-outlined">person</span>
+</div>
+</div>
+</header>
+<main class="flex-1 relative flex">
+<aside class="absolute left-6 top-6 bottom-6 w-[320px] bg-surface rounded-lg shadow-floating z-40 flex flex-col overflow-hidden border border-border-color">
+<div class="p-6 border-b border-border-color">
+<h1 class="font-display text-2xl font-semibold mb-2">Dublin Heat Distribution</h1>
+<p class="text-muted text-sm mb-4">Urban heat island offset and vulnerable patient clusters.</p>
+<label class="flex flex-col w-full h-10 mb-6">
+<div class="flex w-full flex-1 items-stretch rounded-lg border border-border-color bg-background-light overflow-hidden">
+<div class="text-muted flex items-center justify-center pl-3">
+<span class="material-symbols-outlined text-xl">search</span>
+</div>
+<input class="w-full bg-transparent border-none focus:ring-0 text-text-main text-sm px-3 placeholder-muted" placeholder="Search neighborhoods..."/>
+</div>
+</label>
+<div class="bg-red-50 rounded-lg p-4 border border-red-100 flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-0.5" style="font-variation-settings: 'FILL' 1;">warning</span>
+<div>
+<h4 class="font-medium text-primary text-sm">3 High-Risk Zones</h4>
+<p class="text-xs text-text-main mt-1 opacity-80">Extreme heat offsets detected in central districts.</p>
+</div>
+</div>
+</div>
+<div class="p-6 flex-1 overflow-y-auto">
+<h3 class="font-medium text-sm text-muted uppercase tracking-wider mb-4">Map Layers</h3>
+<div class="flex items-center justify-between mb-4">
+<span class="text-sm font-medium">Heat Island Offset</span>
+<button class="w-10 h-6 bg-primary rounded-full relative transition-colors">
+<div class="w-4 h-4 bg-surface rounded-full absolute right-1 top-1 shadow-sm"></div>
+</button>
+</div>
+<div class="mb-8 pl-2 border-l-2 border-border-color">
+<div class="text-xs text-muted mb-2 flex justify-between">
+<span>Cooler (-2°C)</span>
+<span>Hotter (+4°C)</span>
+</div>
+<div class="h-2 w-full rounded-full bg-gradient-to-r from-safe-sage via-risk-amber to-primary mb-3"></div>
+<div class="space-y-2">
+<div class="flex items-center gap-2 text-sm">
+<div class="w-3 h-3 rounded-sm bg-primary bg-opacity-30 border border-primary"></div>
+<span>&gt; +3°C (Severe Risk)</span>
+</div>
+<div class="flex items-center gap-2 text-sm">
+<div class="w-3 h-3 rounded-sm bg-risk-amber bg-opacity-30 border border-risk-amber"></div>
+<span>+1°C to +3°C (Elevated)</span>
+</div>
+<div class="flex items-center gap-2 text-sm">
+<div class="w-3 h-3 rounded-sm bg-safe-sage bg-opacity-30 border border-safe-sage"></div>
+<span>&lt; +1°C (Baseline/Cooler)</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between mb-4">
+<span class="text-sm font-medium">Vulnerable Clusters</span>
+<button class="w-10 h-6 bg-primary rounded-full relative transition-colors">
+<div class="w-4 h-4 bg-surface rounded-full absolute right-1 top-1 shadow-sm"></div>
+</button>
+</div>
+<div class="pl-2 flex items-center gap-2 text-sm text-muted">
+<div class="w-3 h-3 rounded-full bg-text-main border-2 border-surface shadow-sm"></div>
+<span>Anonymized registered users</span>
+</div>
+</div>
+<div class="p-4 border-t border-border-color bg-background-light text-center">
+<p class="text-xs text-muted">Last updated: Today, 14:05</p>
+</div>
+</aside>
+<div class="flex-1 map-bg relative w-full h-full cursor-crosshair">
+<div class="absolute bottom-8 right-8 flex flex-col gap-2 z-40">
+<button class="w-10 h-10 bg-surface rounded-lg shadow-floating flex items-center justify-center text-text-main hover:bg-background-light transition-colors border border-border-color">
+<span class="material-symbols-outlined">add</span>
+</button>
+<button class="w-10 h-10 bg-surface rounded-lg shadow-floating flex items-center justify-center text-text-main hover:bg-background-light transition-colors border border-border-color">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<button class="w-10 h-10 bg-surface rounded-lg shadow-floating flex items-center justify-center text-text-main hover:bg-background-light transition-colors border border-border-color mt-2">
+<span class="material-symbols-outlined">my_location</span>
+</button>
+</div>
+<div class="absolute top-[30%] left-[45%] w-64 h-48 geo-polygon-red rounded-3xl transform rotate-12 flex items-center justify-center tooltip-hover cursor-pointer transition-opacity hover:opacity-80">
+<div class="tooltip-content opacity-0 invisible absolute -top-16 bg-surface px-4 py-2 rounded-lg shadow-floating border border-border-color transition-all duration-200 z-50 whitespace-nowrap">
+<p class="font-display font-semibold text-text-main">Phibsborough</p>
+<p class="text-primary font-medium text-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">local_fire_department</span>
+                        +3.2°C Offset
+                    </p>
+<div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-surface border-b border-r border-border-color rotate-45"></div>
+</div>
+<div class="user-pin top-[20%] left-[30%]"></div>
+<div class="user-pin top-[40%] left-[60%]"></div>
+<div class="user-pin top-[70%] left-[40%]"></div>
+<div class="user-pin top-[55%] left-[80%]"></div>
+<div class="user-pin top-[80%] left-[70%]"></div>
+</div>
+<div class="absolute top-[60%] left-[55%] w-72 h-56 geo-polygon-amber rounded-[2.5rem] transform -rotate-6 flex items-center justify-center tooltip-hover cursor-pointer transition-opacity hover:opacity-80">
+<div class="tooltip-content opacity-0 invisible absolute -top-16 bg-surface px-4 py-2 rounded-lg shadow-floating border border-border-color transition-all duration-200 z-50 whitespace-nowrap">
+<p class="font-display font-semibold text-text-main">Rathmines</p>
+<p class="text-risk-amber font-medium text-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">warning</span>
+                        +1.8°C Offset
+                    </p>
+<div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-surface border-b border-r border-border-color rotate-45"></div>
+</div>
+<div class="user-pin top-[30%] left-[40%]"></div>
+<div class="user-pin top-[60%] left-[30%]"></div>
+<div class="user-pin top-[50%] left-[70%]"></div>
+</div>
+<div class="absolute top-[20%] left-[10%] w-96 h-80 geo-polygon-sage rounded-full transform rotate-45 flex items-center justify-center tooltip-hover cursor-pointer transition-opacity hover:opacity-80">
+<div class="tooltip-content opacity-0 invisible absolute -top-16 bg-surface px-4 py-2 rounded-lg shadow-floating border border-border-color transition-all duration-200 z-50 whitespace-nowrap">
+<p class="font-display font-semibold text-text-main">Phoenix Park</p>
+<p class="text-safe-sage font-medium text-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">ac_unit</span>
+                        -1.5°C Offset
+                    </p>
+<div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-surface border-b border-r border-border-color rotate-45"></div>
+</div>
+<div class="user-pin top-[40%] left-[50%]"></div>
+</div>
+<div class="absolute top-[45%] left-[65%] w-48 h-40 geo-polygon-red rounded-xl transform rotate-3 flex items-center justify-center tooltip-hover cursor-pointer transition-opacity hover:opacity-80">
+<div class="tooltip-content opacity-0 invisible absolute -top-16 bg-surface px-4 py-2 rounded-lg shadow-floating border border-border-color transition-all duration-200 z-50 whitespace-nowrap">
+<p class="font-display font-semibold text-text-main">Temple Bar</p>
+<p class="text-primary font-medium text-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">local_fire_department</span>
+                       +4.1°C Offset
+                   </p>
+<div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-surface border-b border-r border-border-color rotate-45"></div>
+</div>
+<div class="user-pin top-[25%] left-[25%]"></div>
+<div class="user-pin top-[35%] left-[75%]"></div>
+<div class="user-pin top-[75%] left-[50%]"></div>
+<div class="user-pin top-[60%] left-[85%]"></div>
+<div class="user-pin top-[85%] left-[20%]"></div>
+<div class="user-pin top-[50%] left-[10%]"></div>
+</div>
+</div>
+</main>
+</body></html>
