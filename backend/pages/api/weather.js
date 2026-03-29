@@ -1,4 +1,4 @@
-const { heatZones } = require('../../data/heatZones')
+const { heatZonesByCity, cityCentroids } = require('../../data/heatZones')
 
 async function fetchPoint(lat, lng) {
   const url =
@@ -28,16 +28,24 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
+  const city = req.query.city?.toLowerCase() || 'sevilla'
+  const cityZones = heatZonesByCity[city]
+  const centroid = cityCentroids[city]
+
+  if (!cityZones || !centroid) {
+    return res.status(404).json({ error: `City "${city}" not found` })
+  }
+
   try {
     // Fetch baseline (city centre) + all zone centroids in parallel
     const [baseline, ...zoneResults] = await Promise.all([
-      fetchPoint(37.39, -5.99),
-      ...heatZones.map((z) => fetchPoint(z.centroid.lat, z.centroid.lng)),
+      fetchPoint(centroid.lat, centroid.lng),
+      ...cityZones.map((z) => fetchPoint(z.centroid.lat, z.centroid.lng)),
     ])
 
     // Build zones map keyed by zoneId
     const zones = {}
-    heatZones.forEach((z, i) => {
+    cityZones.forEach((z, i) => {
       zones[z.zoneId] = {
         currentTemp: zoneResults[i].currentTemp,
         peakTemp: zoneResults[i].peakTemp,
@@ -45,7 +53,8 @@ export default async function handler(req, res) {
     })
 
     return res.status(200).json({
-      currentTemp: baseline.currentTemp,  // kept for backwards compat
+      city,
+      currentTemp: baseline.currentTemp,
       peakTemp: baseline.peakTemp,
       hourly: baseline.hourly,
       baseline: { currentTemp: baseline.currentTemp, peakTemp: baseline.peakTemp },

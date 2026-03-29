@@ -125,12 +125,16 @@
 </div>
 <script>
 const API = 'http://localhost:3000';
-fetch(API + '/api/weather')
+fetch(API + '/api/weather?city=sevilla')
   .then(r => r.json())
   .then(data => {
     document.getElementById('live-temp').textContent = Math.round(data.currentTemp) + '°C';
     document.getElementById('baseline-temp').textContent = Math.round(data.currentTemp) + '°C';
   })
-  .catch(() => {});
+  .catch(err => {
+    console.error('Landing page weather error:', err);
+    document.getElementById('live-temp').textContent = '24°C'; // Fallback
+    document.getElementById('baseline-temp').textContent = '24°C';
+  });
 </script>
 </body></html>

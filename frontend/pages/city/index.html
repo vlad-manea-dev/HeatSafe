@@ -123,7 +123,15 @@
 <main class="flex-1 relative flex overflow-hidden">
 <aside class="absolute left-6 top-6 bottom-6 w-[320px] bg-surface rounded-lg shadow-floating z-40 flex flex-col overflow-hidden border border-border-color">
 <div class="p-6 border-b border-border-color">
-<h1 class="font-display text-2xl font-semibold mb-2">Seville Heat Distribution</h1>
+<div class="flex items-center justify-between mb-2">
+<h1 class="font-display text-2xl font-semibold">City Distribution</h1>
+<select id="city-selector" class="text-xs font-semibold bg-background-light border border-border-color rounded px-2 py-1 focus:ring-primary">
+<option value="sevilla">Sevilla</option>
+<option value="madrid">Madrid</option>
+<option value="barcelona">Barcelona</option>
+<option value="valencia">Valencia</option>
+</select>
+</div>
 <p class="text-muted text-sm mb-4">Urban heat island offset and vulnerable patient clusters.</p>
 <label class="flex flex-col w-full h-10 mb-6">
 <div class="flex w-full flex-1 items-stretch rounded-lg border border-border-color bg-background-light overflow-hidden">
@@ -212,9 +220,10 @@
 </main>
 
 <script>
-  const API_BASE = window.location.port === '8080'
+  // Force 3000 for local development
+  const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? 'http://localhost:3000'
-    : (window.location.origin || 'http://localhost:3000')
+    : window.location.origin
 
   // Track state
   let allData = null
@@ -223,9 +232,9 @@
   const userMarkers = []
 
   // Initialize Leaflet map centered on Seville
-  const map = L.map('map', { zoomControl: false }).setView([37.385, -5.990], 14)
+  const map = L.map('map', { zoomControl: false }).setView([37.385, -5.990], 13)
 
-  // CartoDB Positron light tiles — no API key needed
+  // CartoDB Positron light tiles
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
     subdomains: 'abcd',
@@ -235,9 +244,6 @@
   // Layer groups
   const zoneLayer = L.layerGroup().addTo(map)
   const userLayer = L.layerGroup().addTo(map)
-  
-  // Create a canvas layer for the continuous heat surface
-  const heatSurfaceCanvas = L.canvas({ pane: 'tilePane' })
   const heatSurfaceLayer = L.layerGroup().addTo(map)
 
   const HeatSurface = L.Layer.extend({
@@ -245,6 +251,7 @@
       this._container = L.DomUtil.create('canvas', 'leaflet-zoom-animated')
       this._container.style.opacity = '0.45'
       this._container.style.pointerEvents = 'none'
+      this._container.style.zIndex = '1'
       map.getPanes().overlayPane.appendChild(this._container)
       map.on('viewreset', this._reset, this)
       map.on('moveend', this._reset, this)
@@ -266,7 +273,8 @@
       if (!allData || !allData.zones) return
       const ctx = this._container.getContext('2d')
       const size = map.getSize()
-      const step = 20 // Resolution of the grid
+      ctx.clearRect(0, 0, size.x, size.y)
+      const step = 25 // resolution
       
       for (let x = 0; x < size.x; x += step) {
         for (let y = 0; y < size.y; y += step) {
@@ -385,10 +393,25 @@
     }
   }
 
-  async function loadZones() {
+  async function loadZones(city = 'sevilla') {
     try {
-      const res = await fetch(`${API_BASE}/api/zones`)
+      // Clear previous layers
+      zoneLayer.clearLayers()
+      userLayer.clearLayers()
+      zonePolygons.length = 0
+      userMarkers.length = 0
+
+      const url = `${API_BASE}/api/zones?city=${city}`
+      console.log('Fetching live data from:', url);
+      const res = await fetch(url)
       allData = await res.json()
+
+      if (allData.error) throw new Error(allData.error);
+
+      // Center map on new city
+      if (allData.centroid) {
+        map.setView([allData.centroid.lat, allData.centroid.lng], 13)
+      }
 
       // Update severe count
       const count = allData.severeCount || 0
@@ -396,6 +419,8 @@
 
       // Render zone polygons
       allData.zones.forEach((zone) => {
+        if (!zone.coords || zone.coords.length === 0) return
+        
         const poly = L.polygon(zone.coords, {
           color: zone.color,
           fillColor: zone.color,
@@ -431,16 +456,21 @@
 
       updateVisuals()
 
-      // Update timestamp
+      // Update timestamp and status
       const now = new Date()
       const timeStr = now.toLocaleTimeString('en-IE', { hour: '2-digit', minute: '2-digit' })
-      document.getElementById('last-updated').textContent = `Sync: Today, ${timeStr}`
+      document.getElementById('last-updated').innerHTML = `<span class="inline-flex items-center gap-1 text-green-600 font-bold"><span class="w-2 h-2 rounded-full bg-green-600 animate-pulse"></span> LIVE</span> · Today, ${timeStr}`
 
     } catch (err) {
       console.error('Failed to load zones:', err)
-      document.getElementById('last-updated').textContent = 'Failed to load data'
+      document.getElementById('last-updated').textContent = 'Live data sync failed. Try refreshing.'
     }
   }
+
+  // Handle City Switch
+  document.getElementById('city-selector').addEventListener('change', function(e) {
+    loadZones(e.target.value)
+  })
 
   // Handle slider
   document.getElementById('time-slider').addEventListener('input', function(e) {
