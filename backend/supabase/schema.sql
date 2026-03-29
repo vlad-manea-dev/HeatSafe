@@ -33,40 +33,49 @@ create table if not exists scores (
   breakdown_json  jsonb
 );
 
+-- Clean up existing seed data before re-inserting
+delete from medications where person_id in (
+  'aaaaaaaa-0000-0000-0000-000000000001',
+  'aaaaaaaa-0000-0000-0000-000000000002'
+);
+delete from people where id in (
+  'aaaaaaaa-0000-0000-0000-000000000001',
+  'aaaaaaaa-0000-0000-0000-000000000002'
+);
+
 -- SEED: María García (HIGH RISK)
--- Age 76, top floor (4), south-facing, lives alone, heart condition, in Triana, Seville
+-- Age 76, 2nd floor, south-facing, lives alone, heart condition, diuretics — score ~91
 insert into people (id, name, dob, address, phone, floor, south_facing, lives_alone, low_green_cover, conditions)
 values (
   'aaaaaaaa-0000-0000-0000-000000000001',
   'María García',
   '1948-03-15',
-  'Calle Betis 12, 4º, Triana, Sevilla 41010',
+  'Calle Betis 12, 2º, Triana, Sevilla 41010',
   '+34 654 111 222',
-  4,
+  2,
   true,
   true,
-  true,
+  false,
   array['heart_condition']
 );
 
 insert into medications (person_id, drug_class, multiplier)
 values
-  ('aaaaaaaa-0000-0000-0000-000000000001', 'diuretics',     1.3),
-  ('aaaaaaaa-0000-0000-0000-000000000001', 'beta_blockers',  1.2);
+  ('aaaaaaaa-0000-0000-0000-000000000001', 'diuretics', 1.3);
 
--- SEED: Pablo Martínez (LOW RISK)
--- Age 33, ground floor, not alone, no conditions, in Nervión, Seville
+-- SEED: Pablo Martínez (MEDIUM RISK)
+-- Age 33, top floor, south-facing, low green cover — urban risk factors only, no conditions — score ~35
 insert into people (id, name, dob, address, phone, floor, south_facing, lives_alone, low_green_cover, conditions)
 values (
   'aaaaaaaa-0000-0000-0000-000000000002',
   'Pablo Martínez',
   '1991-07-22',
-  'Avenida de la Buharia 8, 1º, Nervión, Sevilla 41005',
+  'Calle Sierpes 45, 3º, Casco Histórico, Sevilla 41004',
   '+34 666 555 444',
-  1,
+  3,
+  true,
   false,
-  false,
-  false,
+  true,
   array[]::text[]
 );
 -- No medications for Pablo

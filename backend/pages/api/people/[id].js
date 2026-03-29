@@ -1,6 +1,7 @@
 import { supabase } from '../../../lib/supabase'
 const { calculateScore } = require('../../../lib/calculateScore')
 const { mockAlerts } = require('../../../data/mockData')
+const { heatZones } = require('../../../data/heatZones')
 
 export default async function handler(req, res) {
   const { id } = req.query
@@ -24,9 +25,23 @@ export default async function handler(req, res) {
 
     const base = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:3000'
     const weatherRes = await fetch(`${base}/api/weather`)
-    const { currentTemp, peakTemp } = await weatherRes.json()
+    const weather = await weatherRes.json()
 
-    const { score, breakdown } = calculateScore(person, meds || [], currentTemp)
+    // Use zone-specific temp
+    const zoneId = person.zone_id
+    const zoneTemp =
+      zoneId && weather.zones && weather.zones[zoneId]
+        ? weather.zones[zoneId].currentTemp
+        : weather.currentTemp
+    const zonePeak =
+      zoneId && weather.zones && weather.zones[zoneId]
+        ? weather.zones[zoneId].peakTemp
+        : weather.peakTemp
+
+    const zone = heatZones.find((z) => z.zoneId === zoneId)
+    const zoneName = zone ? zone.name : 'Seville'
+
+    const { score, breakdown } = calculateScore(person, meds || [], zoneTemp)
 
     const alertData = mockAlerts[id] || { alerts: [], carer_alert: null }
 
@@ -36,8 +51,11 @@ export default async function handler(req, res) {
       score,
       breakdown,
       riskLevel: score >= 70 ? 'high' : score >= 40 ? 'medium' : 'low',
-      currentTemp,
-      peakTemp,
+      currentTemp: weather.currentTemp,
+      peakTemp: weather.peakTemp,
+      zoneTemp,
+      zonePeak,
+      zoneName,
       alerts: alertData.alerts,
       carer_alert: alertData.carer_alert,
     })
