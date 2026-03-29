@@ -1,0 +1,163 @@
+<!-- Caregiver Dashboard -->
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Caregiver Dashboard - HeatSafe</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&amp;family=Outfit:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e23235",
+                        "background-light": "#FDFBF7",
+                        "surface": "#FFFFFF",
+                        "text-main": "#2C2A29",
+                        "muted": "#8A8683",
+                        "border-subtle": "#EAE6E1",
+                        "risk-amber": "#E76F51",
+                        "safe-sage": "#4A7C59",
+                    },
+                    fontFamily: {
+                        "display": ["Fraunces", "serif"],
+                        "body": ["Outfit", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "16px", "xl": "1.5rem", "full": "9999px"},
+                    boxShadow: {
+                        'soft': '0 8px 30px rgba(44, 42, 41, 0.04)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: theme('colors.background-light');
+            color: theme('colors.text-main');
+        }
+        h1, h2, h3, h4, h5, h6, .font-display {
+            font-family: 'Fraunces', serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-background-light text-text-main flex flex-col items-center">
+<div class="relative flex h-auto w-full flex-col bg-surface group/design-root overflow-x-hidden shadow-sm">
+<div class="layout-container flex h-full grow flex-col w-full">
+<div class="px-4 md:px-10 lg:px-40 flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col w-full max-w-[1200px] flex-1">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-border-subtle px-4 md:px-10 py-3">
+<div class="flex items-center gap-4 text-text-main">
+<div class="size-6 text-primary">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_6_535)">
+<path clip-rule="evenodd" d="M47.2426 24L24 47.2426L0.757355 24L24 0.757355L47.2426 24ZM12.2426 21H35.7574L24 9.24264L12.2426 21Z" fill="currentColor" fill-rule="evenodd"></path>
+</g>
+<defs>
+<clippath id="clip0_6_535"><rect fill="white" height="48" width="48"></rect></clippath>
+</defs>
+</svg>
+</div>
+<a href="../index.html"><h2 class="text-text-main text-xl font-display font-semibold leading-tight tracking-[-0.015em]">HeatSafe</h2></a>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border border-border-subtle" data-alt="close-up portrait of an older woman with short grey hair smiling gently, soft natural lighting" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBo8FLKJIqTNmGlDSSTugACZrchw1SDJFZ8fpCzk0_8Pf3i7dIXnbrfgP_jl_NRqZmD8E7QK5N8KeCEjwsD-97wYWo7cnt2ZkhdsHrRFcX3vxvIgtVjIiDVGM945IobCym52kwylxzbAYB836Jbv-6a-xHnO2z3rcAxz7gqRs8pIWE51qIZ89GbvQTd8SVIKJYsPt28xiPcgyZ96v4Nwv7ipNY90edzSWiJZfrIhu_j9wNC5glN6Dyd7vQEymIqiPPICRYhweStbTs");'></div>
+</div>
+</header>
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 p-4 md:px-10 mt-6">
+<div class="flex min-w-72 flex-col gap-2">
+<h1 class="text-text-main font-display text-4xl font-semibold leading-tight">Monitoring 2 people.</h1>
+<p class="text-muted text-lg font-normal leading-normal">Current Seville baseline: <span class="font-medium text-text-main" id="baseline-temp">24°C</span></p>
+</div>
+<div class="flex">
+<div class="flex h-12 flex-1 items-center justify-center rounded-lg bg-background-light border border-border-subtle p-1 shadow-inner">
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-4 has-[:checked]:bg-surface has-[:checked]:shadow-soft has-[:checked]:text-primary has-[:checked]:font-medium text-muted text-base transition-all">
+<span class="truncate">Risk Level</span>
+<input checked="" class="invisible w-0" name="sort-order" type="radio" value="Risk Level"/>
+</label>
+<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-4 has-[:checked]:bg-surface has-[:checked]:shadow-soft has-[:checked]:text-primary has-[:checked]:font-medium text-muted text-base transition-all">
+<span class="truncate">Name</span>
+<input class="invisible w-0" name="sort-order" type="radio" value="Name"/>
+</label>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<main class="w-full max-w-[1200px] mx-auto px-4 md:px-10 lg:px-40 py-8 flex-grow">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<a class="group block bg-surface rounded-lg p-6 shadow-soft border border-transparent hover:border-primary hover:-translate-y-1 transition-all duration-300 relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" href="detail/index.html?id=aaaaaaaa-0000-0000-0000-000000000001">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-2xl font-display text-text-main font-semibold mb-1">María García</h3>
+<p class="text-muted text-base flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+                            Triana, Sevilla
+                        </p>
+</div>
+<div class="flex flex-col items-center justify-center size-14 rounded-full bg-primary text-white shadow-md">
+<span class="text-xl font-bold leading-none" id="score-maria">100</span>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-border-subtle">
+<p class="text-sm text-text-main flex items-start gap-2">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5" style="font-variation-settings: 'FILL' 1;">warning</span>
+<span class="flex-1">Medication alert: Needs extra water with diuretics today due to heat.</span>
+</p>
+</div>
+<div class="absolute inset-x-0 bottom-0 h-1 bg-primary"></div>
+</a>
+<a class="group block bg-surface rounded-lg p-6 shadow-soft border border-transparent hover:border-safe-sage hover:-translate-y-1 transition-all duration-300 relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-safe-sage focus:ring-offset-2" href="detail/index.html?id=aaaaaaaa-0000-0000-0000-000000000002">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-2xl font-display text-text-main font-semibold mb-1">Pablo Martínez</h3>
+<p class="text-muted text-base flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+                            Nervión, Sevilla
+                        </p>
+</div>
+<div class="flex flex-col items-center justify-center size-14 rounded-full bg-safe-sage text-white shadow-md">
+<span class="text-xl font-bold leading-none" id="score-pablo">12</span>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-border-subtle">
+<p class="text-sm text-muted flex items-start gap-2">
+<span class="material-symbols-outlined text-safe-sage text-[20px] mt-0.5">check_circle</span>
+<span class="flex-1">Current conditions are safe. No action needed.</span>
+</p>
+</div>
+<div class="absolute inset-x-0 bottom-0 h-1 bg-safe-sage"></div>
+</a>
+<a href="../register/index.html" class="group flex flex-col items-center justify-center h-full min-h-[220px] bg-transparent rounded-lg p-6 border-2 border-dashed border-border-subtle hover:border-primary hover:bg-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+<div class="size-12 rounded-full bg-background-light flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-3xl">add</span>
+</div>
+<span class="text-lg font-medium text-text-main group-hover:text-primary transition-colors">Register another person</span>
+</a>
+</div>
+</main>
+<script src="/assets/api.js"></script>
+<script>
+  fetchPeople().then(function(data) {
+    var tempEl = document.getElementById('baseline-temp')
+    if (tempEl) tempEl.textContent = Math.round(data.currentTemp) + '°C'
+
+    data.people.forEach(function(person) {
+      if (person.id === 'aaaaaaaa-0000-0000-0000-000000000001') {
+        var el = document.getElementById('score-maria')
+        if (el) el.textContent = person.score
+      }
+      if (person.id === 'aaaaaaaa-0000-0000-0000-000000000002') {
+        var el = document.getElementById('score-pablo')
+        if (el) el.textContent = person.score
+      }
+    })
+  }).catch(function() { /* silently use hardcoded fallbacks */ })
+</script>
+</body></html>

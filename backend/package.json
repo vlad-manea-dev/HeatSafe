@@ -1,0 +1,16 @@
+{
+  "name": "heatsafe-backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start",
+    "generate-alerts": "node scripts/runGenerateAlerts.js"
+  },
+  "dependencies": {
+    "next": "14.2.5",
+    "@supabase/supabase-js": "^2.43.0",
+    "@anthropic-ai/sdk": "^0.24.0"
+  }
+}

@@ -1,0 +1,134 @@
+<!-- Landing Page -->
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HeatSafe - Personalised Heat Risk Alerts</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&amp;family=Outfit:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#e23235",
+              "background-light": "#f8f6f6",
+              "background-dark": "#211112",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"],
+              "heading": ["Fraunces", "serif"],
+              "body": ["Outfit", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+            boxShadow: {
+              'soft': '0 8px 30px rgba(44, 42, 41, 0.04)',
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(226, 50, 53, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(226, 50, 53, 0); }
+            100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(226, 50, 53, 0); }
+        }
+        .animate-pulse-ring {
+            animation: pulse-ring 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-background-light text-[#2C2A29] font-body min-h-screen flex flex-col antialiased">
+<div class="relative flex h-auto w-full flex-col bg-white group/design-root overflow-x-hidden" style='font-family: Inter, "Noto Sans", sans-serif;'>
+<div class="layout-container flex h-full grow flex-col">
+<div class="px-4 md:px-10 lg:px-40 flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col max-w-[1200px] w-full flex-1">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f4f0f0] px-4 md:px-10 py-3">
+<a href="#" class="flex items-center">
+<img src="assets/logo.png" alt="HeatSafe Logo" class="h-10 object-contain mix-blend-multiply" />
+</a>
+<div class="flex flex-1 justify-end gap-4 md:gap-8">
+<div class="hidden md:flex items-center gap-9">
+<a class="text-[#171111] text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">About</a>
+<a class="text-[#171111] text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Contact</a>
+</div>
+<a href="register/index.html" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#e23235] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-red-700 transition-colors">
+<span class="truncate">Register</span>
+</a>
+</div>
+</header>
+<main class="flex-1 flex flex-col w-full py-12 md:py-20 px-4 md:px-8">
+<div class="flex flex-col items-center text-center space-y-8 mb-16 max-w-4xl mx-auto w-full">
+<div class="inline-flex items-center gap-3 bg-white border border-primary rounded-full px-6 py-3 shadow-sm">
+<div class="w-3 h-3 bg-primary rounded-full animate-pulse-ring"></div>
+<span class="font-body font-medium text-lg text-[#2C2A29]">Live Seville Temp: <strong class="font-bold" id="live-temp">24°C</strong></span>
+</div>
+<h1 class="font-heading text-5xl md:text-6xl lg:text-[64px] leading-tight text-[#2C2A29] tracking-tight">
+                            Heat kills.<br class="md:hidden"/> HeatSafe protects.
+                        </h1>
+<p class="font-body text-xl text-[#8A8683] max-w-2xl mt-4">
+                            An early-warning public health system designed to protect elderly residents during extreme heat events.
+                        </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full mb-20 max-w-5xl mx-auto">
+<div class="bg-white rounded-xl p-8 shadow-soft border border-[#EAE6E1] flex flex-col gap-2 items-center md:items-start text-center md:text-left transition-transform hover:-translate-y-1 duration-300">
+<p class="font-heading text-[48px] text-primary leading-none">34%</p>
+<p class="font-body text-[18px] text-[#2C2A29] font-medium">Higher risk for over 75s</p>
+</div>
+<div class="bg-white rounded-xl p-8 shadow-soft border border-[#EAE6E1] flex flex-col gap-2 items-center md:items-start text-center md:text-left transition-transform hover:-translate-y-1 duration-300">
+<p class="font-heading text-[48px] text-primary leading-none" id="baseline-temp">24°C</p>
+<p class="font-body text-[18px] text-[#2C2A29] font-medium">Current Baseline</p>
+</div>
+<div class="bg-white rounded-xl p-8 shadow-soft border border-[#EAE6E1] flex flex-col gap-2 items-center md:items-start text-center md:text-left transition-transform hover:-translate-y-1 duration-300">
+<p class="font-heading text-[48px] text-primary leading-none">1,204</p>
+<p class="font-body text-[18px] text-[#2C2A29] font-medium">Active Alerts Today</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-5xl mx-auto">
+<a class="group block h-[400px] bg-white rounded-lg shadow-soft border-2 border-transparent hover:border-primary hover:scale-[1.02] transition-all duration-300 overflow-hidden relative flex flex-col" href="register/index.html">
+<div class="absolute inset-0 bg-gradient-to-br from-white to-[#FDFBF7] z-0"></div>
+<div class="relative z-10 flex-1 p-10 flex flex-col justify-between h-full">
+<div>
+<span class="material-symbols-outlined text-[48px] text-primary mb-6 block" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<h3 class="font-heading text-3xl text-[#2C2A29] mb-4">Register someone at risk</h3>
+<p class="font-body text-[18px] text-[#8A8683] leading-relaxed">
+                                        Are you a family member or caregiver? Create a profile to receive plain-English SMS alerts when extreme heat threatens your loved one's specific health condition or location.
+                                    </p>
+</div>
+<div class="flex items-center text-primary font-body font-medium text-[18px] group-hover:underline">
+                                    Start registration <span class="material-symbols-outlined ml-2">arrow_forward</span>
+</div>
+</div>
+</a>
+<a class="group block h-[400px] bg-white rounded-lg shadow-soft border-2 border-transparent hover:border-primary hover:scale-[1.02] transition-all duration-300 overflow-hidden relative flex flex-col" href="city/index.html">
+<div class="absolute inset-0 bg-gradient-to-bl from-white to-[#FDFBF7] z-0"></div>
+<div class="relative z-10 flex-1 p-10 flex flex-col justify-between h-full">
+<div>
+<span class="material-symbols-outlined text-[48px] text-primary mb-6 block" style="font-variation-settings: 'FILL' 1;">location_city</span>
+<h3 class="font-heading text-3xl text-[#2C2A29] mb-4">I plan cities</h3>
+<p class="font-body text-[18px] text-[#8A8683] leading-relaxed">
+                                        Access the city-wide dashboard. View interactive maps overlaying urban heat islands with anonymized vulnerable patient clusters to inform civic intervention.
+                                    </p>
+</div>
+<div class="flex items-center text-primary font-body font-medium text-[18px] group-hover:underline">
+                                    View map dashboard <span class="material-symbols-outlined ml-2">arrow_forward</span>
+</div>
+</div>
+</a>
+</div>
+</main>
+</div>
+</div>
+</div>
+<script src="/assets/api.js"></script>
+<script>
+  fetchWeather().then(function(data) {
+    var t = Math.round(data.currentTemp) + '°C'
+    document.getElementById('live-temp').textContent = t
+    document.getElementById('baseline-temp').textContent = t
+  }).catch(function() { /* silently use hardcoded fallbacks */ })
+</script>
+</body></html>
