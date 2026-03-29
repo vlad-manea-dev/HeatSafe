@@ -70,21 +70,10 @@
 </header>
 <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 p-4 md:px-10 mt-6">
 <div class="flex min-w-72 flex-col gap-2">
-<h1 class="text-text-main font-display text-4xl font-semibold leading-tight">Monitoring 2 people.</h1>
-<p class="text-muted text-lg font-normal leading-normal">Current Seville baseline: <span class="font-medium text-text-main" id="baseline-temp">24°C</span></p>
+<h1 class="text-text-main font-display text-4xl font-semibold leading-tight" id="dashboard-title">Monitoring 2 people.</h1>
+<p class="text-muted text-lg font-normal leading-normal">Live Seville temperature: <span class="font-medium text-text-main" id="baseline-temp">—</span></p>
 </div>
-<div class="flex">
-<div class="flex h-12 flex-1 items-center justify-center rounded-lg bg-background-light border border-border-subtle p-1 shadow-inner">
-<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-4 has-[:checked]:bg-surface has-[:checked]:shadow-soft has-[:checked]:text-primary has-[:checked]:font-medium text-muted text-base transition-all">
-<span class="truncate">Risk Level</span>
-<input checked="" class="invisible w-0" name="sort-order" type="radio" value="Risk Level"/>
-</label>
-<label class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-4 has-[:checked]:bg-surface has-[:checked]:shadow-soft has-[:checked]:text-primary has-[:checked]:font-medium text-muted text-base transition-all">
-<span class="truncate">Name</span>
-<input class="invisible w-0" name="sort-order" type="radio" value="Name"/>
-</label>
-</div>
-</div>
+<div id="view-toggle-container"></div>
 </div>
 </div>
 </div>
@@ -144,10 +133,85 @@
 </main>
 <script src="/assets/api.js"></script>
 <script>
+  var myId = localStorage.getItem('heatsafe_my_id')
+  var myName = localStorage.getItem('heatsafe_my_name')
+  var caredFor = JSON.parse(localStorage.getItem('heatsafe_cared_for') || '[]')
+  var currentView = 'carer' // 'self' or 'carer'
+
+  // Inject toggle if user has registered themselves
+  if (myId) {
+    var toggleHTML =
+      '<div class="flex h-12 items-center justify-center rounded-lg bg-background-light border border-border-subtle p-1 shadow-inner">' +
+        '<button id="btn-self" onclick="switchView(\'self\')" class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-4 text-muted text-base transition-all">My Risk</button>' +
+        '<button id="btn-carer" onclick="switchView(\'carer\')" class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-4 bg-surface shadow-soft text-primary font-medium text-base transition-all">People I Care For</button>' +
+      '</div>'
+    var container = document.getElementById('view-toggle-container')
+    if (container) container.innerHTML = toggleHTML
+  }
+
+  function switchView(view) {
+    currentView = view
+    var btnSelf = document.getElementById('btn-self')
+    var btnCarer = document.getElementById('btn-carer')
+    if (view === 'self') {
+      btnSelf.className = 'flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-4 bg-surface shadow-soft text-primary font-medium text-base transition-all'
+      btnCarer.className = 'flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-4 text-muted text-base transition-all'
+      window.location.href = 'detail/index.html?id=' + myId
+    } else {
+      btnCarer.className = 'flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-4 bg-surface shadow-soft text-primary font-medium text-base transition-all'
+      btnSelf.className = 'flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-lg px-4 text-muted text-base transition-all'
+    }
+  }
+
+  function getRiskColor(score) {
+    return score >= 70 ? '#e23235' : score >= 40 ? '#E76F51' : '#4A7C59'
+  }
+  function getRiskIcon(score) {
+    return score >= 70 ? 'warning' : score >= 40 ? 'thermostat' : 'check_circle'
+  }
+  function getRiskMsg(score) {
+    return score >= 70 ? 'High risk — check in today.' : score >= 40 ? 'Elevated risk — monitor conditions.' : 'Conditions currently safe.'
+  }
+
+  function addCaredForCard(person) {
+    var grid = document.querySelector('main .grid')
+    if (!grid || document.getElementById('card-' + person.id)) return
+    var color = getRiskColor(person.score)
+    var icon = getRiskIcon(person.score)
+    var msg = getRiskMsg(person.score)
+    var addBtn = grid.querySelector('a[href*="register"]')
+    var card = document.createElement('a')
+    card.id = 'card-' + person.id
+    card.href = 'detail/index.html?id=' + person.id
+    card.style.cssText = 'display:block; background:#fff; border-radius:8px; padding:24px; box-shadow:0 8px 30px rgba(44,42,41,0.04); border:2px solid transparent; text-decoration:none; position:relative; overflow:hidden; transition:all 0.3s;'
+    card.onmouseover = function() { this.style.borderColor = color; this.style.transform = 'translateY(-4px)' }
+    card.onmouseout = function() { this.style.borderColor = 'transparent'; this.style.transform = '' }
+    card.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">' +
+        '<div><div style="font-size:22px;font-weight:700;color:#2C2A29;margin-bottom:4px">' + person.name + '</div>' +
+        '<div style="color:#8A8683;font-size:14px">' + (person.address || '') + '</div></div>' +
+        '<div style="width:56px;height:56px;border-radius:9999px;background:' + color + ';color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 4px 6px rgba(0,0,0,0.1)">' +
+          '<span style="font-size:20px;font-weight:700;line-height:1">' + person.score + '</span></div></div>' +
+      '<div style="margin-top:24px;padding-top:16px;border-top:1px solid #EAE6E1">' +
+        '<div style="font-size:13px;color:#2C2A29;display:flex;align-items:flex-start;gap:8px">' +
+          '<span class="material-symbols-outlined" style="font-size:20px;color:' + color + ';margin-top:2px">' + icon + '</span>' +
+          '<span>' + msg + '</span></div></div>' +
+      '<div style="position:absolute;bottom:0;left:0;right:0;height:4px;background:' + color + '"></div>'
+    if (addBtn) grid.insertBefore(card, addBtn)
+    else grid.appendChild(card)
+  }
+
+  // Update title count
+  function updateTitle() {
+    var title = document.getElementById('dashboard-title')
+    if (title) title.textContent = 'Monitoring ' + (2 + caredFor.length) + ' people.'
+  }
+
   fetchPeople().then(function(data) {
     var tempEl = document.getElementById('baseline-temp')
     if (tempEl) tempEl.textContent = Math.round(data.currentTemp) + '°C'
 
+    // Update hardcoded demo scores
     data.people.forEach(function(person) {
       if (person.id === 'aaaaaaaa-0000-0000-0000-000000000001') {
         var el = document.getElementById('score-maria')
@@ -158,6 +222,20 @@
         if (el) el.textContent = person.score
       }
     })
+
+    // Fetch and render each cared-for person individually
+    caredFor.forEach(function(entry) {
+      fetchPerson(entry.id).then(function(data) {
+        addCaredForCard({ id: entry.id, name: data.person.name, score: data.score, address: data.person.address })
+        updateTitle()
+      }).catch(function() {
+        // Show card with just name if API fails
+        addCaredForCard({ id: entry.id, name: entry.name, score: 0, address: '' })
+        updateTitle()
+      })
+    })
+
+    updateTitle()
   }).catch(function() { /* silently use hardcoded fallbacks */ })
 </script>
 </body></html>

@@ -1,6 +1,7 @@
 import { supabase } from '../../lib/supabase'
 const { calculateScore } = require('../../lib/calculateScore')
-const { heatZones } = require('../../data/heatZones')
+const { heatZonesByCity } = require('../../data/heatZones')
+const heatZones = heatZonesByCity['sevilla']
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {

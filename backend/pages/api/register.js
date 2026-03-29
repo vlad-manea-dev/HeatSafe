@@ -16,6 +16,7 @@ export default async function handler(req, res) {
     low_green_cover,
     conditions,
     medications,
+    zone_id,
   } = req.body
 
   if (!name || !dob) {
@@ -37,6 +38,7 @@ export default async function handler(req, res) {
         lives_alone: lives_alone || false,
         low_green_cover: low_green_cover || false,
         conditions: conditions || [],
+        zone_id: zone_id || 'nervion',
       })
       .select()
       .single()

@@ -70,39 +70,37 @@
             <div class="space-y-5 flex-1">
                 <div class="flex flex-col gap-1.5">
                     <label class="text-text-muted text-sm font-bold uppercase tracking-wide">Name</label>
-                    <input type="text" class="grid-input" value="Mary O'Brien" />
+                    <input id="input-name" type="text" class="grid-input" placeholder="Full name" />
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <label class="text-text-muted text-sm font-bold uppercase tracking-wide">Date of birth</label>
-                    <input type="text" class="grid-input" value="12 / 03 / 1941" />
+                    <input id="input-dob" type="date" class="grid-input" />
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <label class="text-text-muted text-sm font-bold uppercase tracking-wide">Address</label>
-                    <textarea class="grid-input resize-none py-3" rows="3">14 Pearse St,&#10;Dublin 2</textarea>
+                    <textarea id="input-address" class="grid-input resize-none py-3" rows="3" placeholder="Street address, city"></textarea>
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <label class="text-text-muted text-sm font-bold uppercase tracking-wide">Phone (SMS)</label>
-                    <input type="text" class="grid-input" value="+353 87 123 4567" />
+                    <input id="input-phone" type="text" class="grid-input" placeholder="+34 600 000 000" />
                 </div>
             </div>
 
             <div class="mt-8 space-y-4 pt-8 border-t border-border-muted/60">
-                <label class="flex items-center gap-3 cursor-pointer group">
-                    <div class="w-6 h-6 rounded-md border-2 border-primary bg-primary flex items-center justify-center shadow-sm">
-                        <span class="material-symbols-outlined text-[18px] text-white font-bold">check</span>
-                    </div>
-                    <span class="text-text-main font-bold text-[15px]">I live alone</span>
+                <label class="flex items-center gap-3 cursor-pointer group" onclick="toggleCheck('check-alone', this)">
+                    <div id="check-alone" class="w-6 h-6 rounded-md border-2 border-border-muted bg-[#faf9f9] group-hover:border-primary/50 transition-colors"></div>
+                    <span class="text-text-muted group-hover:text-text-main font-medium text-[15px] transition-colors">I live alone</span>
                 </label>
-                <label class="flex items-center gap-3 cursor-pointer group">
-                    <div class="w-6 h-6 rounded-md border-2 border-border-muted bg-[#faf9f9] group-hover:border-primary/50 transition-colors"></div>
+                <label class="flex items-center gap-3 cursor-pointer group" onclick="toggleCheck('check-topfloor', this)">
+                    <div id="check-topfloor" class="w-6 h-6 rounded-md border-2 border-border-muted bg-[#faf9f9] group-hover:border-primary/50 transition-colors"></div>
                     <span class="text-text-muted group-hover:text-text-main font-medium text-[15px] transition-colors">Top floor apartment</span>
                 </label>
-                <label class="flex items-center gap-3 cursor-pointer group">
-                    <div class="w-6 h-6 rounded-md border-2 border-border-muted bg-[#faf9f9] group-hover:border-primary/50 transition-colors"></div>
+                <label class="flex items-center gap-3 cursor-pointer group" onclick="toggleCheck('check-south', this)">
+                    <div id="check-south" class="w-6 h-6 rounded-md border-2 border-border-muted bg-[#faf9f9] group-hover:border-primary/50 transition-colors"></div>
                     <span class="text-text-muted group-hover:text-text-main font-medium text-[15px] transition-colors">South-facing windows</span>
                 </label>
-                <label class="flex items-center gap-3 cursor-pointer group">
-                    <div class="w-6 h-6 rounded-md border-2 border-border-muted bg-[#faf9f9] group-hover:border-primary/50 transition-colors"></div>
+                <label class="flex items-center gap-3 cursor-pointer group" onclick="toggleCheck('check-noac', this)">
+                    <div id="check-noac" class="w-6 h-6 rounded-md border-2 border-border-muted bg-[#faf9f9] group-hover:border-primary/50 transition-colors"></div>
                     <span class="text-text-muted group-hover:text-text-main font-medium text-[15px] transition-colors">No air conditioning</span>
                 </label>
             </div>
@@ -120,12 +118,12 @@
                 <p class="text-text-main text-[15px] mb-5 leading-relaxed">Tap any that apply. We only use this to calculate heat risk.</p>
                 
                 <div class="flex flex-wrap">
-                    <div class="pill-base bg-amber-50 border-amber-300 text-amber-800 shadow-sm">Beta-blockers</div>
-                    <div class="pill-base bg-red-50 border-red-300 text-red-800 shadow-sm">Loop diuretics</div>
-                    <div class="pill-base pill-unselected">ACE inhibitors</div>
-                    <div class="pill-base pill-unselected">Anticholinergics</div>
-                    <div class="pill-base pill-unselected">Antipsychotics</div>
-                    <div class="pill-base pill-unselected">SSRIs</div>
+                    <div class="pill-base pill-unselected" data-drug="beta_blockers" data-multiplier="1.2" onclick="togglePill(this)">Beta-blockers</div>
+                    <div class="pill-base pill-unselected" data-drug="diuretics" data-multiplier="1.3" onclick="togglePill(this)">Loop diuretics</div>
+                    <div class="pill-base pill-unselected" data-drug="ace_inhibitors" data-multiplier="1.1" onclick="togglePill(this)">ACE inhibitors</div>
+                    <div class="pill-base pill-unselected" data-drug="anticholinergics" data-multiplier="1.25" onclick="togglePill(this)">Anticholinergics</div>
+                    <div class="pill-base pill-unselected" data-drug="antipsychotics" data-multiplier="1.2" onclick="togglePill(this)">Antipsychotics</div>
+                    <div class="pill-base pill-unselected" data-drug="ssris" data-multiplier="1.1" onclick="togglePill(this)">SSRIs</div>
                 </div>
             </div>
 
@@ -197,10 +195,115 @@
     </div>
 
     <!-- Bottom Submit Circle -->
-    <div class="flex justify-center mt-10 mb-6 pb-12">
-        <a href="../dashboard/index.html" class="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white hover:bg-red-700 transition-all cursor-pointer group shadow-lg hover:shadow-xl hover:-translate-y-1">
+    <div class="flex flex-col items-center mt-10 mb-6 pb-12 gap-3">
+        <p id="submit-error" class="text-red-600 text-sm font-medium hidden"></p>
+        <button id="submit-btn" onclick="submitForm()" class="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white hover:bg-red-700 transition-all cursor-pointer group shadow-lg hover:shadow-xl hover:-translate-y-1">
             <span class="material-symbols-outlined text-[32px] group-hover:translate-y-1 transition-transform">arrow_forward</span>
-        </a>
+        </button>
     </div>
+
+<script src="/assets/api.js"></script>
+<script>
+  var mode = new URLSearchParams(window.location.search).get('mode') || 'carer'
+  var checks = { 'check-alone': false, 'check-topfloor': false, 'check-south': false, 'check-noac': false }
+
+  // Show mode label at top of form
+  window.addEventListener('DOMContentLoaded', function() {
+    var header = document.querySelector('h1')
+    if (header && mode === 'self') header.textContent = 'Your details'
+    else if (header) header.textContent = 'Their details'
+  })
+
+  function toggleCheck(id, label) {
+    checks[id] = !checks[id]
+    var box = document.getElementById(id)
+    var span = label.querySelector('span')
+    if (checks[id]) {
+      box.className = 'w-6 h-6 rounded-md border-2 border-primary bg-primary flex items-center justify-center shadow-sm'
+      box.innerHTML = '<span class="material-symbols-outlined text-[18px] text-white font-bold">check</span>'
+      if (span) { span.className = 'text-text-main font-bold text-[15px]' }
+    } else {
+      box.className = 'w-6 h-6 rounded-md border-2 border-border-muted bg-[#faf9f9] group-hover:border-primary/50 transition-colors'
+      box.innerHTML = ''
+      if (span) { span.className = 'text-text-muted group-hover:text-text-main font-medium text-[15px] transition-colors' }
+    }
+  }
+
+  function togglePill(el) {
+    var selected = el.classList.contains('bg-amber-50')
+    if (selected) {
+      el.className = 'pill-base pill-unselected'
+    } else {
+      el.className = 'pill-base bg-amber-50 border-amber-300 text-amber-800 shadow-sm'
+    }
+  }
+
+  async function submitForm() {
+    var name = document.getElementById('input-name').value.trim()
+    var dob = document.getElementById('input-dob').value
+    var address = document.getElementById('input-address').value.trim()
+    var phone = document.getElementById('input-phone').value.trim()
+    var errEl = document.getElementById('submit-error')
+
+    if (!name || !dob) {
+      errEl.textContent = 'Please enter your name and date of birth.'
+      errEl.classList.remove('hidden')
+      return
+    }
+    errEl.classList.add('hidden')
+
+    var medications = []
+    document.querySelectorAll('[data-drug]').forEach(function(pill) {
+      if (pill.classList.contains('bg-amber-50')) {
+        medications.push({
+          drug_class: pill.getAttribute('data-drug'),
+          multiplier: parseFloat(pill.getAttribute('data-multiplier'))
+        })
+      }
+    })
+
+    var floor = checks['check-topfloor'] ? 4 : 1
+
+    var btn = document.getElementById('submit-btn')
+    btn.innerHTML = '<span class="material-symbols-outlined text-[28px]">hourglass_empty</span>'
+
+    try {
+      var result = await registerPerson({
+        name: name,
+        dob: dob,
+        address: address,
+        phone: phone,
+        floor: floor,
+        south_facing: checks['check-south'],
+        lives_alone: checks['check-alone'],
+        low_green_cover: false,
+        conditions: [],
+        medications: medications,
+        zone_id: 'nervion'
+      })
+
+      if (result.id) {
+        if (mode === 'self') {
+          // Save own ID to localStorage — persists across refreshes
+          localStorage.setItem('heatsafe_my_id', result.id)
+          localStorage.setItem('heatsafe_my_name', name)
+          window.location.href = '../dashboard/detail/index.html?id=' + result.id
+        } else {
+          // Add to cared-for list in localStorage
+          var existing = JSON.parse(localStorage.getItem('heatsafe_cared_for') || '[]')
+          existing.push({ id: result.id, name: name })
+          localStorage.setItem('heatsafe_cared_for', JSON.stringify(existing))
+          window.location.href = '../dashboard/index.html'
+        }
+      } else {
+        throw new Error(result.error || 'Registration failed')
+      }
+    } catch (err) {
+      errEl.textContent = 'Something went wrong. Please try again.'
+      errEl.classList.remove('hidden')
+      btn.innerHTML = '<span class="material-symbols-outlined text-[32px]">arrow_forward</span>'
+    }
+  }
+</script>
 </body>
 </html>

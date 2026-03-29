@@ -1,7 +1,8 @@
 import { supabase } from '../../../lib/supabase'
 const { calculateScore } = require('../../../lib/calculateScore')
 const { mockAlerts } = require('../../../data/mockData')
-const { heatZones } = require('../../../data/heatZones')
+const { heatZonesByCity } = require('../../../data/heatZones')
+const heatZones = heatZonesByCity['sevilla']
 
 export default async function handler(req, res) {
   const { id } = req.query
