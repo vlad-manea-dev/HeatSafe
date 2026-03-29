@@ -70,8 +70,8 @@
 </header>
 <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 p-4 md:px-10 mt-6">
 <div class="flex min-w-72 flex-col gap-2">
-<h1 class="text-text-main font-display text-4xl font-semibold leading-tight">Monitoring 3 people.</h1>
-<p class="text-muted text-lg font-normal leading-normal">Current Dublin baseline: <span class="font-medium text-text-main">24°C</span></p>
+<h1 class="text-text-main font-display text-4xl font-semibold leading-tight" id="monitoring-title">Monitoring -- people.</h1>
+<p class="text-muted text-lg font-normal leading-normal">Current Dublin baseline: <span class="font-medium text-text-main" id="dash-temp">--°C</span></p>
 </div>
 <div class="flex">
 <div class="flex h-12 flex-1 items-center justify-center rounded-lg bg-background-light border border-border-subtle p-1 shadow-inner">
@@ -91,76 +91,81 @@
 </div>
 </div>
 <main class="w-full max-w-[1200px] mx-auto px-4 md:px-10 lg:px-40 py-8 flex-grow">
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-<a class="group block bg-surface rounded-lg p-6 shadow-soft border border-transparent hover:border-primary hover:-translate-y-1 transition-all duration-300 relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" href="detail/index.html">
-<div class="flex justify-between items-start mb-4">
-<div>
-<h3 class="text-2xl font-display text-text-main font-semibold mb-1">Mary Smith</h3>
-<p class="text-muted text-base flex items-center gap-1">
-<span class="material-symbols-outlined text-[18px]">location_on</span>
-                            Phibsborough, D07
-                        </p>
-</div>
-<div class="flex flex-col items-center justify-center size-14 rounded-full bg-primary text-white shadow-md">
-<span class="text-xl font-bold leading-none">82</span>
-</div>
-</div>
-<div class="mt-6 pt-4 border-t border-border-subtle">
-<p class="text-sm text-text-main flex items-start gap-2">
-<span class="material-symbols-outlined text-primary text-[20px] mt-0.5" style="font-variation-settings: 'FILL' 1;">warning</span>
-<span class="flex-1">Medication alert: Needs extra water with diuretics today due to heat.</span>
-</p>
-</div>
-<div class="absolute inset-x-0 bottom-0 h-1 bg-primary"></div>
-</a>
-<a class="group block bg-surface rounded-lg p-6 shadow-soft border border-transparent hover:border-risk-amber hover:-translate-y-1 transition-all duration-300 relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-risk-amber focus:ring-offset-2" href="detail/index.html">
-<div class="flex justify-between items-start mb-4">
-<div>
-<h3 class="text-2xl font-display text-text-main font-semibold mb-1">John Doyle</h3>
-<p class="text-muted text-base flex items-center gap-1">
-<span class="material-symbols-outlined text-[18px]">location_on</span>
-                            Drumcondra, D09
-                        </p>
-</div>
-<div class="flex flex-col items-center justify-center size-14 rounded-full bg-risk-amber text-white shadow-md">
-<span class="text-xl font-bold leading-none">54</span>
-</div>
-</div>
-<div class="mt-6 pt-4 border-t border-border-subtle">
-<p class="text-sm text-text-main flex items-start gap-2">
-<span class="material-symbols-outlined text-risk-amber text-[20px] mt-0.5">thermostat</span>
-<span class="flex-1">Top floor apartment. Ensure fans are running this afternoon.</span>
-</p>
-</div>
-<div class="absolute inset-x-0 bottom-0 h-1 bg-risk-amber"></div>
-</a>
-<a class="group block bg-surface rounded-lg p-6 shadow-soft border border-transparent hover:border-safe-sage hover:-translate-y-1 transition-all duration-300 relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-safe-sage focus:ring-offset-2" href="detail/index.html">
-<div class="flex justify-between items-start mb-4">
-<div>
-<h3 class="text-2xl font-display text-text-main font-semibold mb-1">Patricia Byrne</h3>
-<p class="text-muted text-base flex items-center gap-1">
-<span class="material-symbols-outlined text-[18px]">location_on</span>
-                            Clontarf, D03
-                        </p>
-</div>
-<div class="flex flex-col items-center justify-center size-14 rounded-full bg-safe-sage text-white shadow-md">
-<span class="text-xl font-bold leading-none">28</span>
-</div>
-</div>
-<div class="mt-6 pt-4 border-t border-border-subtle">
-<p class="text-sm text-muted flex items-start gap-2">
-<span class="material-symbols-outlined text-safe-sage text-[20px] mt-0.5">check_circle</span>
-<span class="flex-1">Current conditions are safe. No action needed.</span>
-</p>
-</div>
-<div class="absolute inset-x-0 bottom-0 h-1 bg-safe-sage"></div>
-</a>
-<a href="../register/index.html" class="group flex flex-col items-center justify-center h-full min-h-[220px] bg-transparent rounded-lg p-6 border-2 border-dashed border-border-subtle hover:border-primary hover:bg-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
-<div class="size-12 rounded-full bg-background-light flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform">
-<span class="material-symbols-outlined text-3xl">add</span>
-</div>
-<span class="text-lg font-medium text-text-main group-hover:text-primary transition-colors">Register another person</span>
-</a>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="people-grid">
+<div class="col-span-full text-center py-12 text-muted">Loading...</div>
 </div>
 </main>
+<script>
+const API = 'http://localhost:3000';
+
+function getRiskColor(score) {
+  if (score >= 70) return { bg: 'bg-primary', border: 'hover:border-primary', ring: 'focus:ring-primary', icon: 'warning', iconStyle: "font-variation-settings: 'FILL' 1;", textColor: 'text-primary' };
+  if (score >= 40) return { bg: 'bg-risk-amber', border: 'hover:border-risk-amber', ring: 'focus:ring-risk-amber', icon: 'thermostat', iconStyle: '', textColor: 'text-risk-amber' };
+  return { bg: 'bg-safe-sage', border: 'hover:border-safe-sage', ring: 'focus:ring-safe-sage', icon: 'check_circle', iconStyle: '', textColor: 'text-safe-sage' };
+}
+
+function getRiskMessage(person) {
+  if (person.score >= 70) {
+    const meds = person.breakdown.medications;
+    if (meds.length > 0) return `Medication alert: ${meds.map(m => m.drug_class).join(', ')} increase heat risk.`;
+    return 'High risk alert active. Check in regularly.';
+  }
+  if (person.score >= 40) {
+    if (person.breakdown.top_floor) return 'Top floor apartment. Ensure fans are running this afternoon.';
+    return 'Moderate risk. Stay hydrated and avoid peak heat.';
+  }
+  return 'Current conditions are safe. No action needed.';
+}
+
+fetch(API + '/api/people')
+  .then(r => r.json())
+  .then(data => {
+    document.getElementById('dash-temp').textContent = Math.round(data.currentTemp) + '°C';
+    document.getElementById('monitoring-title').textContent = `Monitoring ${data.people.length} people.`;
+
+    const grid = document.getElementById('people-grid');
+    let html = '';
+
+    data.people.forEach(p => {
+      const c = getRiskColor(p.score);
+      const msg = getRiskMessage(p);
+      const textClass = p.score >= 70 ? 'text-text-main' : (p.score >= 40 ? 'text-text-main' : 'text-muted');
+      html += `
+        <a class="group block bg-surface rounded-lg p-6 shadow-soft border border-transparent ${c.border} hover:-translate-y-1 transition-all duration-300 relative overflow-hidden focus:outline-none focus:ring-2 ${c.ring} focus:ring-offset-2" href="detail/index.html?id=${p.id}">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <h3 class="text-2xl font-display text-text-main font-semibold mb-1">${p.name}</h3>
+              <p class="text-muted text-base flex items-center gap-1">
+                <span class="material-symbols-outlined text-[18px]">location_on</span>
+                ${p.address}
+              </p>
+            </div>
+            <div class="flex flex-col items-center justify-center size-14 rounded-full ${c.bg} text-white shadow-md">
+              <span class="text-xl font-bold leading-none">${p.score}</span>
+            </div>
+          </div>
+          <div class="mt-6 pt-4 border-t border-border-subtle">
+            <p class="text-sm ${textClass} flex items-start gap-2">
+              <span class="material-symbols-outlined ${c.textColor} text-[20px] mt-0.5" style="${c.iconStyle}">${c.icon}</span>
+              <span class="flex-1">${msg}</span>
+            </p>
+          </div>
+          <div class="absolute inset-x-0 bottom-0 h-1 ${c.bg}"></div>
+        </a>`;
+    });
+
+    html += `
+      <a href="../register/index.html" class="group flex flex-col items-center justify-center h-full min-h-[220px] bg-transparent rounded-lg p-6 border-2 border-dashed border-border-subtle hover:border-primary hover:bg-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+        <div class="size-12 rounded-full bg-background-light flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform">
+          <span class="material-symbols-outlined text-3xl">add</span>
+        </div>
+        <span class="text-lg font-medium text-text-main group-hover:text-primary transition-colors">Register another person</span>
+      </a>`;
+
+    grid.innerHTML = html;
+  })
+  .catch(() => {
+    document.getElementById('people-grid').innerHTML = '<div class="col-span-full text-center py-12 text-primary">Failed to load data. Is the backend running?</div>';
+  });
+</script>
 </body></html>

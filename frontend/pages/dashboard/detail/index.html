@@ -37,18 +37,17 @@ tailwind.config = {
 <div class="flex items-center gap-4">
 <div class="w-16 h-16 rounded-full bg-gray-200 bg-cover bg-center" data-alt="portrait" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCQLVJX3-jgHn05RbH-l1VxQQr5tjCAKkV52AgF-B761rSRZJHIcj1VLi9I_u1L1e8ciLKugtvE0XaVDZRLyzYGyVGS5ZBxHCU4mN5DbMHQ-XjAMlPBddfQibQK0eeqWIpaTp28Xf_Vql1oQkOXAojOvcSTPSxNRBU3c8RO2J1J5vhU-IVnjgc528wYJlm9yypliSEYL_hvS_Te3ck4k87siBQFTqgtIxUxGP76NICluF7iI3bohbjewMzJxbK4ypu5Kmm_vPdUYVQ');"></div>
 <div>
-<h1 class="text-3xl font-bold tracking-tight text-gray-900">Mary Sullivan</h1>
-<p class="text-gray-600 font-medium flex items-center gap-1 mt-1">
+<h1 class="text-3xl font-bold tracking-tight text-gray-900" id="person-name">Loading...</h1>
+<p class="text-gray-600 font-medium flex items-center gap-1 mt-1" id="person-address">
 <span class="material-symbols-outlined text-sm">location_on</span>
-                            Phibsborough, Dublin
                         </p>
 </div>
 </div>
 </div>
 <div>
-<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary font-semibold text-sm">
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary font-semibold text-sm" id="risk-badge">
 <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                    High Risk Alert Active
+                    Loading...
                 </span>
 </div>
 </header>
@@ -59,30 +58,30 @@ tailwind.config = {
 <span class="material-symbols-outlined text-primary">analytics</span>
                         Current Risk Metrics
                     </h2>
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="metrics-grid">
 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between">
 <div class="flex justify-between items-start mb-2">
 <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Local Temp</p>
 <span class="material-symbols-outlined text-gray-400">thermostat</span>
 </div>
-<p class="text-4xl font-bold text-gray-900">25°C</p>
-<p class="text-sm text-gray-500 mt-2">Baseline for Dublin area</p>
+<p class="text-4xl font-bold text-gray-900" id="metric-temp">--°C</p>
+<p class="text-sm text-gray-500 mt-2">Current temperature</p>
 </div>
 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between">
 <div class="flex justify-between items-start mb-2">
-<p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Urban Heat Offset</p>
-<span class="material-symbols-outlined text-orange-500">location_city</span>
+<p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Peak Temp Today</p>
+<span class="material-symbols-outlined text-orange-500">local_fire_department</span>
 </div>
-<p class="text-4xl font-bold text-orange-600">+2°C</p>
-<p class="text-sm text-gray-500 mt-2">Due to high-density housing</p>
+<p class="text-4xl font-bold text-orange-600" id="metric-peak">--°C</p>
+<p class="text-sm text-gray-500 mt-2">Forecast high for today</p>
 </div>
 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between">
 <div class="flex justify-between items-start mb-2">
 <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Medication Multiplier</p>
 <span class="material-symbols-outlined text-primary">medication</span>
 </div>
-<p class="text-4xl font-bold text-primary">1.5x</p>
-<p class="text-sm text-gray-500 mt-2">Diuretics affect hydration</p>
+<p class="text-4xl font-bold text-primary" id="metric-med">--x</p>
+<p class="text-sm text-gray-500 mt-2" id="metric-med-desc">Loading...</p>
 </div>
 <div class="bg-white p-6 rounded-xl shadow-sm border border-primary/20 bg-primary/5 flex flex-col justify-between">
 <div class="flex justify-between items-start mb-2">
@@ -90,43 +89,16 @@ tailwind.config = {
 <span class="material-symbols-outlined text-primary">warning</span>
 </div>
 <div class="flex items-baseline gap-2">
-<p class="text-5xl font-black text-primary">68</p>
+<p class="text-5xl font-black text-primary" id="metric-score">--</p>
 <span class="text-xl font-medium text-gray-600">/100</span>
 </div>
-<p class="text-sm font-medium text-primary mt-2">Action Recommended</p>
+<p class="text-sm font-medium text-primary mt-2" id="metric-status">Loading...</p>
 </div>
 </div>
 </section>
-<section class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+<section class="bg-white p-6 rounded-xl shadow-sm border border-gray-100" id="breakdown-section">
 <h3 class="text-lg font-semibold mb-6 text-gray-800">Risk Score Breakdown</h3>
-<div class="relative pt-2">
-<div class="flex h-6 rounded-full overflow-hidden w-full bg-gray-100 mb-4">
-<div class="bg-blue-200 h-full" style="width: 40%" title="Baseline: 40pts"></div>
-<div class="bg-orange-300 h-full" style="width: 15%" title="Urban Heat Island: +15pts"></div>
-<div class="bg-primary h-full" style="width: 13%" title="Health Multiplier: +13pts"></div>
-</div>
-<div class="absolute w-full flex justify-between text-xs font-medium text-gray-400 mt-1 px-1">
-<span>0</span>
-<span>25</span>
-<span>50</span>
-<span>75</span>
-<span>100</span>
-</div>
-</div>
-<div class="mt-8 flex flex-col sm:flex-row gap-4 sm:gap-6 pt-4 border-t border-gray-100">
-<div class="flex items-center gap-2">
-<span class="w-3 h-3 rounded-full bg-blue-200"></span>
-<span class="text-sm font-medium text-gray-700">Baseline Temp</span>
-</div>
-<div class="flex items-center gap-2">
-<span class="w-3 h-3 rounded-full bg-orange-300"></span>
-<span class="text-sm font-medium text-gray-700">Urban Heat Addition</span>
-</div>
-<div class="flex items-center gap-2">
-<span class="w-3 h-3 rounded-full bg-primary"></span>
-<span class="text-sm font-medium text-gray-700">Health Multiplier</span>
-</div>
-</div>
+<div id="breakdown-bars" class="space-y-3"></div>
 </section>
 </div>
 <div class="lg:col-span-5">
@@ -138,49 +110,112 @@ tailwind.config = {
                         </h2>
 <span class="text-sm text-gray-500 font-medium">Today</span>
 </div>
-<div class="space-y-4">
-<div class="relative pl-4 border-l-4 border-primary bg-background-light p-4 rounded-r-lg">
-<div class="flex items-start justify-between mb-2">
-<span class="text-xs font-bold text-primary uppercase tracking-wider">14:00</span>
-<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">sms</span>
+<div class="space-y-4" id="timeline-container">
+<p class="text-gray-500 text-center py-8">Loading alerts...</p>
 </div>
-<p class="text-gray-800 font-medium mb-1">Automated SMS Sent</p>
-<p class="text-sm text-gray-600 bg-white p-3 rounded border border-gray-200 italic">
-                                "Warning: Dublin is 26°C locally. Ensure Mary takes her medication with extra water."
-                            </p>
-<div class="mt-3 flex items-center gap-1.5 text-xs text-green-600 font-medium">
-<span class="material-symbols-outlined text-sm">check_circle</span>
-                                Delivered to Caregiver (John Sullivan)
-                            </div>
-</div>
-<div class="relative pl-4 border-l-4 border-orange-400 bg-background-light p-4 rounded-r-lg">
-<div class="flex items-start justify-between mb-2">
-<span class="text-xs font-bold text-orange-600 uppercase tracking-wider">12:30</span>
-<span class="material-symbols-outlined text-orange-500 text-sm">thermostat</span>
-</div>
-<p class="text-gray-800 font-medium mb-1">Risk Score Elevated</p>
-<p class="text-sm text-gray-600">
-                                Score crossed threshold (65/100) due to rising local temperatures.
-                            </p>
-</div>
-<div class="relative pl-4 border-l-4 border-gray-300 bg-background-light p-4 rounded-r-lg opacity-75">
-<div class="flex items-start justify-between mb-2">
-<span class="text-xs font-bold text-gray-500 uppercase tracking-wider">08:00</span>
-<span class="material-symbols-outlined text-gray-400 text-sm">routine</span>
-</div>
-<p class="text-gray-800 font-medium mb-1">Daily Baseline Check</p>
-<p class="text-sm text-gray-600">
-                                Initial risk score calculated at 42/100. Status: Safe.
-                            </p>
-</div>
-</div>
-<button class="w-full mt-6 py-3 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
-                        View Full History
-                        <span class="material-symbols-outlined text-sm">expand_more</span>
-</button>
 </section>
 </div>
 </div>
 </div>
+<script>
+const API = 'http://localhost:3000';
+const params = new URLSearchParams(window.location.search);
+const personId = params.get('id');
+
+if (!personId) {
+  document.getElementById('person-name').textContent = 'No person selected';
+} else {
+  fetch(API + '/api/people/' + personId)
+    .then(r => r.json())
+    .then(data => {
+      // Header
+      document.getElementById('person-name').textContent = data.person.name;
+      document.getElementById('person-address').innerHTML =
+        '<span class="material-symbols-outlined text-sm">location_on</span> ' + data.person.address;
+
+      // Risk badge
+      const badge = document.getElementById('risk-badge');
+      if (data.riskLevel === 'high') {
+        badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span> High Risk Alert Active';
+      } else if (data.riskLevel === 'medium') {
+        badge.className = badge.className.replace('bg-primary/10 text-primary', 'bg-orange-100 text-orange-700');
+        badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-orange-500"></span> Moderate Risk';
+      } else {
+        badge.className = badge.className.replace('bg-primary/10 text-primary', 'bg-green-100 text-green-700');
+        badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-green-500"></span> Low Risk';
+      }
+
+      // Metrics
+      document.getElementById('metric-temp').textContent = Math.round(data.currentTemp) + '°C';
+      document.getElementById('metric-peak').textContent = Math.round(data.peakTemp) + '°C';
+      document.getElementById('metric-med').textContent = data.breakdown.multiplier + 'x';
+      const medNames = data.breakdown.medications.map(m => m.drug_class).join(', ');
+      document.getElementById('metric-med-desc').textContent = medNames ? medNames + ' affect hydration' : 'No heat-risk medications';
+      document.getElementById('metric-score').textContent = data.score;
+      document.getElementById('metric-status').textContent =
+        data.score >= 70 ? 'Action Required' : data.score >= 40 ? 'Monitor Closely' : 'Safe';
+
+      // Breakdown bars
+      const breakdownEl = document.getElementById('breakdown-bars');
+      const factors = [];
+      if (data.breakdown.age) factors.push({ label: 'Age (70+)', value: data.breakdown.age, color: 'bg-blue-300' });
+      if (data.breakdown.top_floor) factors.push({ label: 'Top floor', value: data.breakdown.top_floor, color: 'bg-orange-300' });
+      if (data.breakdown.cardio_respiratory) factors.push({ label: 'Heart/respiratory', value: data.breakdown.cardio_respiratory, color: 'bg-red-300' });
+      if (data.breakdown.extreme_temp) factors.push({ label: 'Extreme temp', value: data.breakdown.extreme_temp, color: 'bg-yellow-400' });
+      if (data.breakdown.low_green_cover) factors.push({ label: 'Low green cover', value: data.breakdown.low_green_cover, color: 'bg-amber-300' });
+      if (data.breakdown.lives_alone) factors.push({ label: 'Lives alone', value: data.breakdown.lives_alone, color: 'bg-purple-300' });
+      if (data.breakdown.south_facing) factors.push({ label: 'South-facing', value: data.breakdown.south_facing, color: 'bg-pink-300' });
+
+      let barsHtml = '';
+      factors.forEach(f => {
+        barsHtml += `
+          <div class="flex items-center gap-3">
+            <span class="text-sm text-gray-600 w-36 shrink-0">${f.label}</span>
+            <div class="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+              <div class="${f.color} h-full rounded-full" style="width: ${f.value}%"></div>
+            </div>
+            <span class="text-sm font-medium text-gray-700 w-8 text-right">+${f.value}</span>
+          </div>`;
+      });
+      if (data.breakdown.multiplier > 1) {
+        barsHtml += `<p class="text-sm text-gray-500 mt-2 pt-2 border-t border-gray-100">Medication multiplier: <strong class="text-primary">${data.breakdown.multiplier}x</strong> applied to base score of ${data.breakdown.base_before_multiplier}</p>`;
+      }
+      breakdownEl.innerHTML = barsHtml;
+
+      // Timeline
+      const timeline = document.getElementById('timeline-container');
+      if (data.alerts && data.alerts.length > 0) {
+        let html = '';
+        data.alerts.forEach((alert, i) => {
+          const isFirst = i === 0;
+          html += `
+            <div class="relative pl-4 border-l-4 ${isFirst ? 'border-primary' : 'border-gray-300'} bg-background-light p-4 rounded-r-lg ${isFirst ? '' : 'opacity-75'}">
+              <div class="flex items-start justify-between mb-2">
+                <span class="text-xs font-bold ${isFirst ? 'text-primary' : 'text-gray-500'} uppercase tracking-wider">${alert.time}</span>
+                <span class="material-symbols-outlined ${isFirst ? 'text-primary' : 'text-gray-400'} text-sm" style="font-variation-settings: 'FILL' 1;">sms</span>
+              </div>
+              <p class="text-sm text-gray-600 bg-white p-3 rounded border border-gray-200 italic">"${alert.message}"</p>
+            </div>`;
+        });
+        if (data.carer_alert) {
+          html += `
+            <div class="relative pl-4 border-l-4 border-red-500 bg-red-50 p-4 rounded-r-lg">
+              <div class="flex items-start justify-between mb-2">
+                <span class="text-xs font-bold text-red-600 uppercase tracking-wider">Carer Alert</span>
+                <span class="material-symbols-outlined text-red-500 text-sm" style="font-variation-settings: 'FILL' 1;">emergency</span>
+              </div>
+              <p class="text-sm text-red-800 bg-white p-3 rounded border border-red-200 italic">"${data.carer_alert}"</p>
+            </div>`;
+        }
+        timeline.innerHTML = html;
+      } else {
+        timeline.innerHTML = '<p class="text-gray-500 text-center py-8">No alerts generated yet for today.</p>';
+      }
+    })
+    .catch(() => {
+      document.getElementById('person-name').textContent = 'Error loading data';
+    });
+}
+</script>
 </body>
 </html>

@@ -70,40 +70,38 @@
             <div class="space-y-5 flex-1">
                 <div class="flex flex-col gap-1.5">
                     <label class="text-text-muted text-sm font-bold uppercase tracking-wide">Name</label>
-                    <input type="text" class="grid-input" value="Mary O'Brien" />
+                    <input type="text" class="grid-input" id="reg-name" placeholder="Full name" />
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <label class="text-text-muted text-sm font-bold uppercase tracking-wide">Date of birth</label>
-                    <input type="text" class="grid-input" value="12 / 03 / 1941" />
+                    <input type="date" class="grid-input" id="reg-dob" />
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <label class="text-text-muted text-sm font-bold uppercase tracking-wide">Address</label>
-                    <textarea class="grid-input resize-none py-3" rows="3">14 Pearse St,&#10;Dublin 2</textarea>
+                    <textarea class="grid-input resize-none py-3" rows="3" id="reg-address" placeholder="Street address"></textarea>
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <label class="text-text-muted text-sm font-bold uppercase tracking-wide">Phone (SMS)</label>
-                    <input type="text" class="grid-input" value="+353 87 123 4567" />
+                    <input type="tel" class="grid-input" id="reg-phone" placeholder="+353 87 123 4567" />
                 </div>
             </div>
 
             <div class="mt-8 space-y-4 pt-8 border-t border-border-muted/60">
                 <label class="flex items-center gap-3 cursor-pointer group">
-                    <div class="w-6 h-6 rounded-md border-2 border-primary bg-primary flex items-center justify-center shadow-sm">
-                        <span class="material-symbols-outlined text-[18px] text-white font-bold">check</span>
-                    </div>
-                    <span class="text-text-main font-bold text-[15px]">I live alone</span>
+                    <input type="checkbox" id="reg-lives-alone" class="w-5 h-5 rounded border-2 border-border-muted text-primary focus:ring-primary" />
+                    <span class="text-text-main font-medium text-[15px]">I live alone</span>
                 </label>
                 <label class="flex items-center gap-3 cursor-pointer group">
-                    <div class="w-6 h-6 rounded-md border-2 border-border-muted bg-[#faf9f9] group-hover:border-primary/50 transition-colors"></div>
-                    <span class="text-text-muted group-hover:text-text-main font-medium text-[15px] transition-colors">Top floor apartment</span>
+                    <input type="checkbox" id="reg-top-floor" class="w-5 h-5 rounded border-2 border-border-muted text-primary focus:ring-primary" />
+                    <span class="text-text-main font-medium text-[15px]">Top floor apartment</span>
                 </label>
                 <label class="flex items-center gap-3 cursor-pointer group">
-                    <div class="w-6 h-6 rounded-md border-2 border-border-muted bg-[#faf9f9] group-hover:border-primary/50 transition-colors"></div>
-                    <span class="text-text-muted group-hover:text-text-main font-medium text-[15px] transition-colors">South-facing windows</span>
+                    <input type="checkbox" id="reg-south-facing" class="w-5 h-5 rounded border-2 border-border-muted text-primary focus:ring-primary" />
+                    <span class="text-text-main font-medium text-[15px]">South-facing windows</span>
                 </label>
                 <label class="flex items-center gap-3 cursor-pointer group">
-                    <div class="w-6 h-6 rounded-md border-2 border-border-muted bg-[#faf9f9] group-hover:border-primary/50 transition-colors"></div>
-                    <span class="text-text-muted group-hover:text-text-main font-medium text-[15px] transition-colors">No air conditioning</span>
+                    <input type="checkbox" id="reg-low-green" class="w-5 h-5 rounded border-2 border-border-muted text-primary focus:ring-primary" />
+                    <span class="text-text-main font-medium text-[15px]">Low green cover area</span>
                 </label>
             </div>
         </div>
@@ -119,13 +117,13 @@
                 <h3 class="text-text-muted text-xs font-bold tracking-widest uppercase mb-2">Your Current Medications</h3>
                 <p class="text-text-main text-[15px] mb-5 leading-relaxed">Tap any that apply. We only use this to calculate heat risk.</p>
                 
-                <div class="flex flex-wrap">
-                    <div class="pill-base bg-amber-50 border-amber-300 text-amber-800 shadow-sm">Beta-blockers</div>
-                    <div class="pill-base bg-red-50 border-red-300 text-red-800 shadow-sm">Loop diuretics</div>
-                    <div class="pill-base pill-unselected">ACE inhibitors</div>
-                    <div class="pill-base pill-unselected">Anticholinergics</div>
-                    <div class="pill-base pill-unselected">Antipsychotics</div>
-                    <div class="pill-base pill-unselected">SSRIs</div>
+                <div class="flex flex-wrap" id="med-pills">
+                    <div class="pill-base pill-unselected" data-drug="beta_blockers" data-mult="1.2">Beta-blockers</div>
+                    <div class="pill-base pill-unselected" data-drug="diuretics" data-mult="1.3">Loop diuretics</div>
+                    <div class="pill-base pill-unselected" data-drug="ace_inhibitors" data-mult="1.15">ACE inhibitors</div>
+                    <div class="pill-base pill-unselected" data-drug="anticholinergics" data-mult="1.25">Anticholinergics</div>
+                    <div class="pill-base pill-unselected" data-drug="antipsychotics" data-mult="1.3">Antipsychotics</div>
+                    <div class="pill-base pill-unselected" data-drug="ssris" data-mult="1.1">SSRIs</div>
                 </div>
             </div>
 
@@ -196,11 +194,89 @@
         </div>
     </div>
 
-    <!-- Bottom Submit Circle -->
+    <!-- Bottom Submit -->
     <div class="flex justify-center mt-10 mb-6 pb-12">
-        <a href="../dashboard/index.html" class="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white hover:bg-red-700 transition-all cursor-pointer group shadow-lg hover:shadow-xl hover:-translate-y-1">
+        <button id="submit-btn" class="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white hover:bg-red-700 transition-all cursor-pointer group shadow-lg hover:shadow-xl hover:-translate-y-1">
             <span class="material-symbols-outlined text-[32px] group-hover:translate-y-1 transition-transform">arrow_forward</span>
-        </a>
+        </button>
     </div>
+    <div id="submit-error" class="hidden text-center text-primary font-medium pb-4"></div>
+
+<script>
+const API = 'http://localhost:3000';
+
+// Pill toggle
+document.getElementById('med-pills').addEventListener('click', (e) => {
+  const pill = e.target.closest('.pill-base');
+  if (!pill) return;
+  const isSelected = pill.dataset.selected === 'true';
+  if (isSelected) {
+    pill.dataset.selected = 'false';
+    pill.className = 'pill-base pill-unselected';
+  } else {
+    pill.dataset.selected = 'true';
+    pill.className = 'pill-base bg-red-50 border-red-300 text-red-800 shadow-sm';
+  }
+});
+
+// Submit
+document.getElementById('submit-btn').addEventListener('click', async () => {
+  const name = document.getElementById('reg-name').value.trim();
+  const dob = document.getElementById('reg-dob').value;
+  const address = document.getElementById('reg-address').value.trim();
+  const phone = document.getElementById('reg-phone').value.trim();
+  const lives_alone = document.getElementById('reg-lives-alone').checked;
+  const top_floor = document.getElementById('reg-top-floor').checked;
+  const south_facing = document.getElementById('reg-south-facing').checked;
+  const low_green_cover = document.getElementById('reg-low-green').checked;
+
+  if (!name || !dob) {
+    document.getElementById('submit-error').textContent = 'Name and date of birth are required.';
+    document.getElementById('submit-error').classList.remove('hidden');
+    return;
+  }
+
+  const selectedMeds = [];
+  document.querySelectorAll('#med-pills .pill-base[data-selected="true"]').forEach(pill => {
+    selectedMeds.push({ drug_class: pill.dataset.drug, multiplier: parseFloat(pill.dataset.mult) });
+  });
+
+  const body = {
+    name,
+    dob,
+    address,
+    phone,
+    floor: top_floor ? 3 : 1,
+    south_facing,
+    lives_alone,
+    low_green_cover,
+    conditions: [],
+    medications: selectedMeds,
+  };
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.classList.add('opacity-50');
+
+  try {
+    const res = await fetch(API + '/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (data.success) {
+      window.location.href = '../dashboard/index.html';
+    } else {
+      throw new Error(data.error || 'Registration failed');
+    }
+  } catch (err) {
+    document.getElementById('submit-error').textContent = err.message;
+    document.getElementById('submit-error').classList.remove('hidden');
+    btn.disabled = false;
+    btn.classList.remove('opacity-50');
+  }
+});
+</script>
 </body>
 </html>

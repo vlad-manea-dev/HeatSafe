@@ -4,6 +4,8 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>HeatSafe - City Map View</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&amp;family=Outfit:wght@400;500&amp;display=swap" rel="stylesheet"/>
@@ -39,45 +41,65 @@
 <style>
         body { font-family: 'Outfit', sans-serif; }
         h1, h2, h3, h4, h5, h6 { font-family: 'Fraunces', serif; }
-        
-        .map-bg {
-            background-color: #e5e5e5;
-            background-image: radial-gradient(#d4d4d4 1px, transparent 1px);
-            background-size: 20px 20px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .geo-polygon-sage {
-            background-color: rgba(74, 124, 89, 0.3);
-            border: 2px solid #4A7C59;
-        }
-        
-        .geo-polygon-amber {
-            background-color: rgba(231, 111, 81, 0.3);
-            border: 2px solid #E76F51;
-        }
-        
-        .geo-polygon-red {
-            background-color: rgba(217, 56, 58, 0.3);
-            border: 2px solid #D9383A;
+
+        /* Fix Leaflet img reset conflict with Tailwind */
+        .leaflet-container img { max-width: none !important; }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            background: #e8e0d8;
         }
 
-        .user-pin {
-            width: 12px;
-            height: 12px;
-            background-color: #2C2A29;
+        /* Custom Leaflet tooltip */
+        .leaflet-tooltip.heat-tooltip {
+            background: #FFFFFF;
+            border: 1px solid #EAE6E1;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 10px 14px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            color: #2C2A29;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+        .leaflet-tooltip.heat-tooltip::before { display: none; }
+        .heat-tooltip .zone-name {
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        .heat-tooltip .zone-temp { font-weight: 500; font-size: 13px; margin-bottom: 2px; }
+        .heat-tooltip .zone-reason { color: #8A8683; font-size: 11px; max-width: 220px; white-space: normal; line-height: 1.4; }
+
+        /* User pin popup */
+        .leaflet-popup-content-wrapper {
+            border-radius: 0.5rem !important;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08) !important;
+            border: 1px solid #EAE6E1;
+            font-family: 'Outfit', sans-serif;
+        }
+        .leaflet-popup-tip-container { display: none; }
+        .pin-popup .pin-name { font-family: 'Fraunces', serif; font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+        .pin-popup .pin-address { color: #8A8683; font-size: 12px; margin-bottom: 8px; }
+        .pin-popup .pin-summary { font-size: 12px; color: #2C2A29; margin-bottom: 10px; line-height: 1.5; }
+        .pin-popup .pin-link { font-size: 12px; color: #D9383A; font-weight: 500; text-decoration: none; }
+        .pin-popup .pin-link:hover { text-decoration: underline; }
+
+        /* Div icon for user pins */
+        .user-marker {
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
             border: 2px solid #FFFFFF;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            position: absolute;
-            transform: translate(-50%, -50%);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
         }
 
-        .tooltip-hover:hover .tooltip-content {
-            opacity: 1;
-            visibility: visible;
-        }
+        /* Toggle button active state */
+        .layer-toggle.active { background-color: #D9383A; }
+        .layer-toggle { transition: background-color 0.2s; }
     </style>
 </head>
 <body class="bg-background-light text-text-main h-screen w-full overflow-hidden flex flex-col">
@@ -98,32 +120,53 @@
 </div>
 </div>
 </header>
-<main class="flex-1 relative flex">
+<main class="flex-1 relative flex overflow-hidden">
 <aside class="absolute left-6 top-6 bottom-6 w-[320px] bg-surface rounded-lg shadow-floating z-40 flex flex-col overflow-hidden border border-border-color">
 <div class="p-6 border-b border-border-color">
-<h1 class="font-display text-2xl font-semibold mb-2">Dublin Heat Distribution</h1>
+<h1 class="font-display text-2xl font-semibold mb-2">Seville Heat Distribution</h1>
 <p class="text-muted text-sm mb-4">Urban heat island offset and vulnerable patient clusters.</p>
 <label class="flex flex-col w-full h-10 mb-6">
 <div class="flex w-full flex-1 items-stretch rounded-lg border border-border-color bg-background-light overflow-hidden">
 <div class="text-muted flex items-center justify-center pl-3">
 <span class="material-symbols-outlined text-xl">search</span>
 </div>
-<input class="w-full bg-transparent border-none focus:ring-0 text-text-main text-sm px-3 placeholder-muted" placeholder="Search neighborhoods..."/>
+<input id="zone-search" class="w-full bg-transparent border-none focus:ring-0 text-text-main text-sm px-3 placeholder-muted" placeholder="Search neighbourhoods..."/>
 </div>
 </label>
-<div class="bg-red-50 rounded-lg p-4 border border-red-100 flex items-start gap-3">
+<div id="severe-alert" class="bg-red-50 rounded-lg p-4 border border-red-100 flex items-start gap-3">
 <span class="material-symbols-outlined text-primary mt-0.5" style="font-variation-settings: 'FILL' 1;">warning</span>
 <div>
-<h4 class="font-medium text-primary text-sm">3 High-Risk Zones</h4>
+<h4 id="severe-count-label" class="font-medium text-primary text-sm">— High-Risk Zones</h4>
 <p class="text-xs text-text-main mt-1 opacity-80">Extreme heat offsets detected in central districts.</p>
 </div>
 </div>
 </div>
 <div class="p-6 flex-1 overflow-y-auto">
+<div class="mb-8">
+<div class="flex items-center justify-between mb-2">
+<h3 class="font-medium text-sm text-muted uppercase tracking-wider">Time of Day</h3>
+<span id="display-time" class="text-xs font-semibold bg-background-light px-2 py-1 rounded border border-border-color">12:00</span>
+</div>
+<input id="time-slider" type="range" min="0" max="23" value="12" class="w-full h-2 bg-border-color rounded-lg appearance-none cursor-pointer accent-primary focus:outline-none"/>
+<div class="flex justify-between text-[10px] text-muted mt-2 px-1">
+<span>00:00</span>
+<span>06:00</span>
+<span>12:00</span>
+<span>18:00</span>
+<span>23:59</span>
+</div>
+</div>
+
 <h3 class="font-medium text-sm text-muted uppercase tracking-wider mb-4">Map Layers</h3>
 <div class="flex items-center justify-between mb-4">
+<span class="text-sm font-medium">Thermal Surface</span>
+<button id="toggle-surface" class="layer-toggle active w-10 h-6 rounded-full relative">
+<div class="w-4 h-4 bg-surface rounded-full absolute right-1 top-1 shadow-sm"></div>
+</button>
+</div>
+<div class="flex items-center justify-between mb-4">
 <span class="text-sm font-medium">Heat Island Offset</span>
-<button class="w-10 h-6 bg-primary rounded-full relative transition-colors">
+<button id="toggle-zones" class="layer-toggle active w-10 h-6 rounded-full relative">
 <div class="w-4 h-4 bg-surface rounded-full absolute right-1 top-1 shadow-sm"></div>
 </button>
 </div>
@@ -150,86 +193,328 @@
 </div>
 <div class="flex items-center justify-between mb-4">
 <span class="text-sm font-medium">Vulnerable Clusters</span>
-<button class="w-10 h-6 bg-primary rounded-full relative transition-colors">
+<button id="toggle-users" class="layer-toggle active w-10 h-6 rounded-full relative">
 <div class="w-4 h-4 bg-surface rounded-full absolute right-1 top-1 shadow-sm"></div>
 </button>
 </div>
 <div class="pl-2 flex items-center gap-2 text-sm text-muted">
 <div class="w-3 h-3 rounded-full bg-text-main border-2 border-surface shadow-sm"></div>
-<span>Anonymized registered users</span>
+<span>Registered users by risk score</span>
 </div>
 </div>
 <div class="p-4 border-t border-border-color bg-background-light text-center">
-<p class="text-xs text-muted">Last updated: Today, 14:05</p>
+<p id="last-updated" class="text-xs text-muted">Loading...</p>
 </div>
 </aside>
-<div class="flex-1 map-bg relative w-full h-full cursor-crosshair">
-<div class="absolute bottom-8 right-8 flex flex-col gap-2 z-40">
-<button class="w-10 h-10 bg-surface rounded-lg shadow-floating flex items-center justify-center text-text-main hover:bg-background-light transition-colors border border-border-color">
-<span class="material-symbols-outlined">add</span>
-</button>
-<button class="w-10 h-10 bg-surface rounded-lg shadow-floating flex items-center justify-center text-text-main hover:bg-background-light transition-colors border border-border-color">
-<span class="material-symbols-outlined">remove</span>
-</button>
-<button class="w-10 h-10 bg-surface rounded-lg shadow-floating flex items-center justify-center text-text-main hover:bg-background-light transition-colors border border-border-color mt-2">
-<span class="material-symbols-outlined">my_location</span>
-</button>
-</div>
-<div class="absolute top-[30%] left-[45%] w-64 h-48 geo-polygon-red rounded-3xl transform rotate-12 flex items-center justify-center tooltip-hover cursor-pointer transition-opacity hover:opacity-80">
-<div class="tooltip-content opacity-0 invisible absolute -top-16 bg-surface px-4 py-2 rounded-lg shadow-floating border border-border-color transition-all duration-200 z-50 whitespace-nowrap">
-<p class="font-display font-semibold text-text-main">Phibsborough</p>
-<p class="text-primary font-medium text-sm flex items-center gap-1">
-<span class="material-symbols-outlined text-xs">local_fire_department</span>
-                        +3.2°C Offset
-                    </p>
-<div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-surface border-b border-r border-border-color rotate-45"></div>
-</div>
-<div class="user-pin top-[20%] left-[30%]"></div>
-<div class="user-pin top-[40%] left-[60%]"></div>
-<div class="user-pin top-[70%] left-[40%]"></div>
-<div class="user-pin top-[55%] left-[80%]"></div>
-<div class="user-pin top-[80%] left-[70%]"></div>
-</div>
-<div class="absolute top-[60%] left-[55%] w-72 h-56 geo-polygon-amber rounded-[2.5rem] transform -rotate-6 flex items-center justify-center tooltip-hover cursor-pointer transition-opacity hover:opacity-80">
-<div class="tooltip-content opacity-0 invisible absolute -top-16 bg-surface px-4 py-2 rounded-lg shadow-floating border border-border-color transition-all duration-200 z-50 whitespace-nowrap">
-<p class="font-display font-semibold text-text-main">Rathmines</p>
-<p class="text-risk-amber font-medium text-sm flex items-center gap-1">
-<span class="material-symbols-outlined text-xs">warning</span>
-                        +1.8°C Offset
-                    </p>
-<div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-surface border-b border-r border-border-color rotate-45"></div>
-</div>
-<div class="user-pin top-[30%] left-[40%]"></div>
-<div class="user-pin top-[60%] left-[30%]"></div>
-<div class="user-pin top-[50%] left-[70%]"></div>
-</div>
-<div class="absolute top-[20%] left-[10%] w-96 h-80 geo-polygon-sage rounded-full transform rotate-45 flex items-center justify-center tooltip-hover cursor-pointer transition-opacity hover:opacity-80">
-<div class="tooltip-content opacity-0 invisible absolute -top-16 bg-surface px-4 py-2 rounded-lg shadow-floating border border-border-color transition-all duration-200 z-50 whitespace-nowrap">
-<p class="font-display font-semibold text-text-main">Phoenix Park</p>
-<p class="text-safe-sage font-medium text-sm flex items-center gap-1">
-<span class="material-symbols-outlined text-xs">ac_unit</span>
-                        -1.5°C Offset
-                    </p>
-<div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-surface border-b border-r border-border-color rotate-45"></div>
-</div>
-<div class="user-pin top-[40%] left-[50%]"></div>
-</div>
-<div class="absolute top-[45%] left-[65%] w-48 h-40 geo-polygon-red rounded-xl transform rotate-3 flex items-center justify-center tooltip-hover cursor-pointer transition-opacity hover:opacity-80">
-<div class="tooltip-content opacity-0 invisible absolute -top-16 bg-surface px-4 py-2 rounded-lg shadow-floating border border-border-color transition-all duration-200 z-50 whitespace-nowrap">
-<p class="font-display font-semibold text-text-main">Temple Bar</p>
-<p class="text-primary font-medium text-sm flex items-center gap-1">
-<span class="material-symbols-outlined text-xs">local_fire_department</span>
-                       +4.1°C Offset
-                   </p>
-<div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-surface border-b border-r border-border-color rotate-45"></div>
-</div>
-<div class="user-pin top-[25%] left-[25%]"></div>
-<div class="user-pin top-[35%] left-[75%]"></div>
-<div class="user-pin top-[75%] left-[50%]"></div>
-<div class="user-pin top-[60%] left-[85%]"></div>
-<div class="user-pin top-[85%] left-[20%]"></div>
-<div class="user-pin top-[50%] left-[10%]"></div>
-</div>
+<div class="flex-1 relative z-0 w-full h-full">
+<div id="map"></div>
 </div>
 </main>
+
+<script>
+  const API_BASE = window.location.port === '8080'
+    ? 'http://localhost:3000'
+    : (window.location.origin || 'http://localhost:3000')
+
+  // Track state
+  let allData = null
+  let currentHour = new Date().getHours()
+  const zonePolygons = []
+  const userMarkers = []
+
+  // Initialize Leaflet map centered on Seville
+  const map = L.map('map', { zoomControl: false }).setView([37.385, -5.990], 14)
+
+  // CartoDB Positron light tiles — no API key needed
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 19,
+  }).addTo(map)
+
+  // Layer groups
+  const zoneLayer = L.layerGroup().addTo(map)
+  const userLayer = L.layerGroup().addTo(map)
+  
+  // Create a canvas layer for the continuous heat surface
+  const heatSurfaceCanvas = L.canvas({ pane: 'tilePane' })
+  const heatSurfaceLayer = L.layerGroup().addTo(map)
+
+  const HeatSurface = L.Layer.extend({
+    onAdd: function(map) {
+      this._container = L.DomUtil.create('canvas', 'leaflet-zoom-animated')
+      this._container.style.opacity = '0.45'
+      this._container.style.pointerEvents = 'none'
+      map.getPanes().overlayPane.appendChild(this._container)
+      map.on('viewreset', this._reset, this)
+      map.on('moveend', this._reset, this)
+      this._reset()
+    },
+    onRemove: function(map) {
+      map.getPanes().overlayPane.removeChild(this._container)
+      map.off('viewreset', this._reset, this)
+      map.off('moveend', this._reset, this)
+    },
+    _reset: function() {
+      const size = map.getSize()
+      this._container.width = size.x
+      this._container.height = size.y
+      L.DomUtil.setPosition(this._container, map.containerPointToLayerPoint([0, 0]))
+      this._draw()
+    },
+    _draw: function() {
+      if (!allData || !allData.zones) return
+      const ctx = this._container.getContext('2d')
+      const size = map.getSize()
+      const step = 20 // Resolution of the grid
+      
+      for (let x = 0; x < size.x; x += step) {
+        for (let y = 0; y < size.y; y += step) {
+          const latlng = map.containerPointToLatLng([x + step/2, y + step/2])
+          const temp = getTempAt(latlng.lat, latlng.lng, currentHour)
+          ctx.fillStyle = tempToColor(temp)
+          ctx.fillRect(x, y, step, step)
+        }
+      }
+    }
+  })
+
+  const heatSurface = new HeatSurface()
+  heatSurface.addTo(heatSurfaceLayer)
+
+  function scoreColor(score) {
+    if (score >= 70) return '#D9383A'
+    if (score >= 40) return '#E76F51'
+    return '#4A7C59'
+  }
+
+  function riskLabel(score) {
+    if (score >= 70) return 'High'
+    if (score >= 40) return 'Medium'
+    return 'Low'
+  }
+
+  function offsetIcon(offset) {
+    return offset > 0 ? '🔥' : '❄️'
+  }
+
+  // IDW Interpolation: calculate temp at any point based on known nodes
+  function getTempAt(lat, lng, hour) {
+    if (!allData || !allData.zones) return 0
+    const baselineHour = allData.hourly[hour] || { temp: 25 }
+    const baseTemp = baselineHour.temp
+
+    let numerator = 0
+    let denominator = 0
+    const p = 2 // Power parameter for IDW
+
+    allData.zones.forEach((z) => {
+      const dist = Math.sqrt(Math.pow(lat - z.centroid.lat, 2) + Math.pow(lng - z.centroid.lng, 2))
+      if (dist === 0) return baseTemp + z.offset
+      const weight = 1 / Math.pow(dist, p)
+      numerator += (baseTemp + z.offset) * weight
+      denominator += weight
+    })
+
+    return denominator === 0 ? baseTemp : numerator / denominator
+  }
+
+  function tempToColor(temp) {
+    // 25 is cool (sage), 35 is elevated (amber), 45 is severe (red)
+    if (temp >= 42) return '#D9383A'
+    if (temp >= 36) return '#E76F51'
+    if (temp >= 28) return '#F4A261'
+    return '#4A7C59'
+  }
+
+  function updateVisuals() {
+    if (!allData) return
+
+    const hourStr = currentHour.toString().padStart(2, '0') + ':00'
+    document.getElementById('display-time').textContent = hourStr
+
+    // Update Zones
+    zonePolygons.forEach(({ zone, poly }) => {
+      const localTemp = getTempAt(zone.centroid.lat, zone.centroid.lng, currentHour)
+      const color = tempToColor(localTemp)
+      poly.setStyle({ color: color, fillColor: color })
+
+      const tempSign = zone.offset >= 0 ? '+' : ''
+      const tooltipHtml = `
+        <div class="zone-name">${zone.name}</div>
+        <div class="zone-temp" style="color:${color}">${offsetIcon(zone.offset)} ${tempSign}${zone.offset}°C offset · ${localTemp.toFixed(1)}°C at ${hourStr}</div>
+        <div class="zone-reason">${zone.reason}</div>
+      `
+      poly.setTooltipContent(tooltipHtml)
+    })
+
+    // Update User Pins
+    userMarkers.forEach(({ user, marker }) => {
+      const localTemp = getTempAt(user.lat, user.lng, currentHour)
+      // Recalculate risk score based on current temperature
+      let riskBonus = 0
+      if (localTemp > 40) riskBonus = 30
+      else if (localTemp > 35) riskBonus = 15
+      
+      const displayScore = Math.min(100, user.score + riskBonus)
+      const color = scoreColor(displayScore)
+      
+      const pinElement = marker.getElement()
+      if (pinElement) {
+        pinElement.querySelector('.user-marker').style.backgroundColor = color
+      }
+      
+      const popupHtml = `
+        <div class="pin-popup" style="min-width:200px;padding:4px 2px">
+          <div class="pin-name">${user.name}</div>
+          <div class="pin-address">${user.address}</div>
+          <div style="margin-bottom:4px">
+            <span style="background:${color};color:#fff;font-size:11px;font-weight:600;padding:2px 8px;border-radius:9999px">${riskLabel(displayScore)} · Score: ${displayScore}</span>
+          </div>
+          <div class="text-[11px] font-medium text-muted mb-2">${localTemp.toFixed(1)}°C local exposure</div>
+          <div class="pin-summary">${user.summary}</div>
+          <a class="pin-link" href="${user.detailUrl}">View full profile →</a>
+        </div>
+      `
+      marker.setPopupContent(popupHtml)
+    })
+
+    // Redraw the continuous heat surface
+    if (heatSurface && heatSurface._draw) {
+      heatSurface._draw()
+    }
+  }
+
+  async function loadZones() {
+    try {
+      const res = await fetch(`${API_BASE}/api/zones`)
+      allData = await res.json()
+
+      // Update severe count
+      const count = allData.severeCount || 0
+      document.getElementById('severe-count-label').textContent = `${count} High-Risk Zone${count !== 1 ? 's' : ''}`
+
+      // Render zone polygons
+      allData.zones.forEach((zone) => {
+        const poly = L.polygon(zone.coords, {
+          color: zone.color,
+          fillColor: zone.color,
+          fillOpacity: 0.25,
+          weight: 1.5,
+          dashArray: '4, 4'
+        }).addTo(zoneLayer)
+
+        poly.bindTooltip('', {
+          className: 'heat-tooltip',
+          sticky: true,
+          offset: [10, 0],
+        })
+
+        zonePolygons.push({ zone, poly })
+      })
+
+      // Render user pins
+      allData.users.forEach((user) => {
+        const color = scoreColor(user.score)
+        const icon = L.divIcon({
+          className: '',
+          html: `<div class="user-marker" style="background-color:${color}; transition: background-color 0.3s ease;"></div>`,
+          iconSize: [14, 14],
+          iconAnchor: [7, 7],
+          popupAnchor: [0, -10],
+        })
+
+        const marker = L.marker([user.lat, user.lng], { icon }).addTo(userLayer)
+        marker.bindPopup('', { maxWidth: 260 })
+        userMarkers.push({ user, marker })
+      })
+
+      updateVisuals()
+
+      // Update timestamp
+      const now = new Date()
+      const timeStr = now.toLocaleTimeString('en-IE', { hour: '2-digit', minute: '2-digit' })
+      document.getElementById('last-updated').textContent = `Sync: Today, ${timeStr}`
+
+    } catch (err) {
+      console.error('Failed to load zones:', err)
+      document.getElementById('last-updated').textContent = 'Failed to load data'
+    }
+  }
+
+  // Handle slider
+  document.getElementById('time-slider').addEventListener('input', function(e) {
+    currentHour = parseInt(e.target.value)
+    updateVisuals()
+  })
+
+  // Layer toggles
+  let zonesVisible = true
+  let usersVisible = true
+  let surfaceVisible = true
+
+  document.getElementById('toggle-surface').addEventListener('click', function () {
+    surfaceVisible = !surfaceVisible
+    this.classList.toggle('active', surfaceVisible)
+    this.style.backgroundColor = surfaceVisible ? '#D9383A' : '#8A8683'
+    const thumb = this.querySelector('div')
+    thumb.style.right = surfaceVisible ? '4px' : 'auto'
+    thumb.style.left = surfaceVisible ? 'auto' : '4px'
+    if (surfaceVisible) {
+      heatSurfaceLayer.addTo(map)
+    } else {
+      map.removeLayer(heatSurfaceLayer)
+    }
+  })
+
+  document.getElementById('toggle-zones').addEventListener('click', function () {
+    zonesVisible = !zonesVisible
+    this.classList.toggle('active', zonesVisible)
+    this.style.backgroundColor = zonesVisible ? '#D9383A' : '#8A8683'
+    const thumb = this.querySelector('div')
+    thumb.style.right = zonesVisible ? '4px' : 'auto'
+    thumb.style.left = zonesVisible ? 'auto' : '4px'
+    if (zonesVisible) {
+      zoneLayer.addTo(map)
+    } else {
+      map.removeLayer(zoneLayer)
+    }
+  })
+
+  document.getElementById('toggle-users').addEventListener('click', function () {
+    usersVisible = !usersVisible
+    this.classList.toggle('active', usersVisible)
+    this.style.backgroundColor = usersVisible ? '#D9383A' : '#8A8683'
+    const thumb = this.querySelector('div')
+    thumb.style.right = usersVisible ? '4px' : 'auto'
+    thumb.style.left = usersVisible ? 'auto' : '4px'
+    if (usersVisible) {
+      userLayer.addTo(map)
+    } else {
+      map.removeLayer(userLayer)
+    }
+  })
+
+  // Set initial toggle button colors
+  document.getElementById('toggle-surface').style.backgroundColor = '#D9383A'
+  document.getElementById('toggle-zones').style.backgroundColor = '#D9383A'
+  document.getElementById('toggle-users').style.backgroundColor = '#D9383A'
+
+  // Zone search: highlight matching zone
+  document.getElementById('zone-search').addEventListener('input', function () {
+    const query = this.value.trim().toLowerCase()
+    zonePolygons.forEach(({ zone, poly }) => {
+      if (!query) {
+        poly.setStyle({ weight: 1.5, fillOpacity: 0.25 })
+      } else if (zone.name.toLowerCase().includes(query)) {
+        poly.setStyle({ weight: 3, fillOpacity: 0.5 })
+        map.fitBounds(poly.getBounds(), { padding: [40, 40] })
+      } else {
+        poly.setStyle({ weight: 1, fillOpacity: 0.1 })
+      }
+    })
+  })
+
+  loadZones()
+</script>
 </body></html>
