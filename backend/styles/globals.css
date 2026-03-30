@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Landing page base styles (teammate) ─────────────────────────────────── */
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -28,20 +30,122 @@
 }
 
 @keyframes pulse-ring {
-  0% {
-    transform: scale(1);
-    opacity: 0.5;
-  }
-  70% {
-    transform: scale(2.2);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 0;
-  }
+  0%   { transform: scale(1);   opacity: 0.5; }
+  70%  { transform: scale(2.2); opacity: 0; }
+  100% { transform: scale(1);   opacity: 0; }
 }
 
 .pulse-ring {
   animation: pulse-ring 2s ease-out infinite;
 }
+
+/* ── Map page styles ─────────────────────────────────────────────────────── */
+
+/* Leaflet img reset — prevents Tailwind from capping map tile images */
+.leaflet-container img {
+  max-width: none !important;
+}
+
+/* Virtual park marker (enterprise map) */
+.virtual-park-marker {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #4A7C59;
+  border: 3px solid white;
+  box-shadow: 0 0 15px rgba(74, 124, 89, 0.8);
+  animation: pulse-green 2s infinite;
+}
+
+@keyframes pulse-green {
+  0%   { box-shadow: 0 0 0 0 rgba(74, 124, 89, 0.7); }
+  70%  { box-shadow: 0 0 0 15px rgba(74, 124, 89, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(74, 124, 89, 0); }
+}
+
+/* User pin marker (city map) */
+.user-marker {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+/* Layer toggle buttons */
+.layer-toggle { transition: background-color 0.2s; }
+.layer-toggle.active { background-color: #D9383A; }
+
+/* Custom Leaflet tooltip */
+.leaflet-tooltip.heat-tooltip {
+  background: #FFFFFF;
+  border: 1px solid #EAE6E1;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  padding: 10px 14px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  color: #2C2A29;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.leaflet-tooltip.heat-tooltip::before { display: none; }
+.heat-tooltip .zone-name  { font-family: 'Fraunces', serif; font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+.heat-tooltip .zone-temp  { font-weight: 500; font-size: 13px; margin-bottom: 2px; }
+.heat-tooltip .zone-reason { color: #8A8683; font-size: 11px; max-width: 220px; white-space: normal; line-height: 1.4; }
+
+/* Bivariate hexbin tooltip (enterprise) */
+.hex-tooltip {
+  background: #FFFFFF;
+  border: 1px solid #EAE6E1;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  padding: 10px 14px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  color: #2C2A29;
+  pointer-events: none;
+}
+
+/* Leaflet popup overrides */
+.leaflet-popup-content-wrapper {
+  border-radius: 0.5rem !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08) !important;
+  border: 1px solid #EAE6E1;
+  font-family: 'Outfit', sans-serif;
+}
+.leaflet-popup-tip-container { display: none; }
+.pin-popup .pin-name    { font-family: 'Fraunces', serif; font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+.pin-popup .pin-address { color: #8A8683; font-size: 12px; margin-bottom: 8px; }
+.pin-popup .pin-summary { font-size: 12px; color: #2C2A29; margin-bottom: 10px; line-height: 1.5; }
+.pin-popup .pin-link    { font-size: 12px; color: #D9383A; font-weight: 500; text-decoration: none; }
+.pin-popup .pin-link:hover { text-decoration: underline; }
+
+/* Greenery optimizer bars */
+.opt-bar-track { background: #EAE6E1; border-radius: 9999px; height: 6px; }
+.opt-bar-fill  { border-radius: 9999px; height: 6px; transition: width 0.5s ease; }
+
+/* Optimal site marker pulsing ring */
+@keyframes opt-pulse-ring {
+  0%   { transform: scale(1);   opacity: 0.8; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+.opt-marker-outer {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: #4A7C59;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  position: relative;
+}
+.opt-marker-outer::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: rgba(74,124,89,0.4);
+  animation: opt-pulse-ring 1.5s ease-out infinite;
+}
+
+/* Simulation crosshair cursor */
+.simulation-mode { cursor: crosshair !important; }

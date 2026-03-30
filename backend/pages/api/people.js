@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     if (pErr) throw pErr
 
     // Fetch all zone temps in one call
-    const base = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:3000'
+    const base = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8080'
     let weather = { currentTemp: 25, peakTemp: 32, zones: {} }
     try {
       const weatherRes = await fetch(`${base}/api/weather`)

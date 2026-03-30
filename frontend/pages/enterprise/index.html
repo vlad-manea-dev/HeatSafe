@@ -132,6 +132,14 @@
         <span class="material-symbols-outlined text-[16px]">add_location</span>
         Add Virtual Park (-3.5°C Offset)
     </button>
+    <button id="optimize-btn" class="w-full mt-2 bg-safe-sage text-white rounded py-2 text-sm font-medium hover:opacity-90 transition-colors flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-[16px]">psychology</span>
+        Find Optimal Sites
+    </button>
+    <button id="export-ai-btn" class="w-full mt-2 bg-text-main text-white rounded py-2 text-sm font-medium hover:opacity-90 transition-colors flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-[16px]">terminal</span>
+        Copy for AI Analysis
+    </button>
     <button id="clear-sim-btn" class="w-full mt-2 border border-enterprise-blue text-enterprise-blue rounded py-2 text-sm font-medium hover:bg-blue-50 transition-colors hidden">
         Clear Simulations
     </button>
@@ -193,7 +201,7 @@
 
 <script>
   const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'http://localhost:3000'
+    ? 'http://localhost:8080'
     : window.location.origin
 
   // State
@@ -220,6 +228,7 @@
   const heatSurfaceLayer = L.layerGroup().addTo(map)
   const hexLayer = L.layerGroup()
   const virtualLayer = L.layerGroup().addTo(map)
+  const optimalLayer = L.layerGroup().addTo(map)
 
   // IDW Thermal Surface
   const HeatSurface = L.Layer.extend({
@@ -399,6 +408,74 @@
     document.getElementById('roi-savings').textContent = `€${savings.toLocaleString()}`
   }
 
+  // Site Optimizer: Scans for High Heat + High Density
+  function findOptimalSites() {
+      optimalLayer.clearLayers()
+      if (!allData || !allData.users) return
+
+      const bounds = map.getBounds()
+      const candidates = []
+      const step = 0.01 // Grid step in lat/lng
+
+      // Scan the visible map area
+      for (let lat = bounds.getSouth(); lat < bounds.getNorth(); lat += step) {
+          for (let lng = bounds.getWest(); lng < bounds.getEast(); lng += step) {
+              const temp = getTempAt(lat, lng, currentHour, true)
+              
+              // Count users near this grid point
+              let localUsers = 0
+              allData.users.forEach(u => {
+                  const d = Math.sqrt(Math.pow(u.lat - lat, 2) + Math.pow(u.lng - lng, 2))
+                  if (d < 0.01) localUsers++
+              })
+
+              // Scoring: Heat Intensity * Population Density
+              const offset = temp - (allData.baseline.currentTemp || 30)
+              const score = offset * localUsers
+
+              if (score > 0) {
+                  candidates.push({ lat, lng, score, temp, population: localUsers * 10 })
+              }
+          }
+      }
+
+      // Sort and pick top 3
+      candidates.sort((a, b) => b.score - a.score)
+      const topSites = candidates.slice(0, 3)
+
+      topSites.forEach((site, i) => {
+          const goldIcon = L.divIcon({
+              className: '',
+              html: `
+                <div class="relative flex items-center justify-center">
+                    <div class="absolute w-12 h-12 bg-safe-sage opacity-20 rounded-full animate-ping"></div>
+                    <div class="w-8 h-8 rounded-full bg-white border-2 border-safe-sage flex items-center justify-center shadow-floating z-10">
+                        <span class="text-safe-sage font-bold text-xs">${i+1}</span>
+                    </div>
+                </div>`,
+              iconSize: [32, 32],
+              iconAnchor: [16, 16]
+          })
+
+          const marker = L.marker([site.lat, site.lng], { icon: goldIcon }).addTo(optimalLayer)
+          marker.bindTooltip(`
+              <div class="p-2">
+                  <div class="text-safe-sage font-bold uppercase text-[10px] mb-1">Priority Site #${i+1}</div>
+                  <div class="font-display font-semibold text-sm mb-1">Optimal Greenery Location</div>
+                  <div class="text-xs text-muted">
+                      Heat Offset: <span class="text-primary font-bold">+${(site.temp - allData.baseline.currentTemp).toFixed(1)}°C</span><br/>
+                      Est. Protected Pop: <b>${site.population}</b><br/>
+                      <span class="mt-2 block text-enterprise-blue">ROI: Maximum cooling for vulnerable residents.</span>
+                  </div>
+              </div>
+          `, { permanent: true, direction: 'top', className: 'hex-tooltip' })
+      })
+
+      if (topSites.length > 0) {
+          map.panTo([topSites[0].lat, topSites[0].lng])
+      }
+  }
+
   // Map Click for Simulator
   map.on('click', function(e) {
       if (!isSimulating) return
@@ -444,6 +521,49 @@
           toast.style.opacity = '1'
           toast.style.transform = 'translate(-50%, 0)'
       }, 10)
+  })
+
+  document.getElementById('optimize-btn').addEventListener('click', () => {
+      findOptimalSites()
+  })
+
+  document.getElementById('export-ai-btn').addEventListener('click', async () => {
+      if (!allData) return
+      
+      // Prepare a structured summary for Claude
+      const exportData = {
+          analysis_type: "Urban Heat Island Optimization",
+          timestamp: new Date().toISOString(),
+          city: allData.city,
+          baseline_temp: allData.baseline.currentTemp,
+          heat_multiplier_nodes: allData.zones.map(z => ({
+              id: z.zoneId,
+              name: z.name,
+              lat: z.centroid.lat,
+              lng: z.centroid.lng,
+              offset: z.offset,
+              physical_reasoning: z.reason
+          })),
+          vulnerable_population_sample: allData.users.map(u => ({
+              name: u.name,
+              lat: u.lat,
+              lng: u.lng,
+              base_risk_score: u.score,
+              health_factors: u.summary
+          }))
+      }
+
+      const blob = JSON.stringify(exportData, null, 2)
+      await navigator.clipboard.writeText(blob)
+      
+      const btn = document.getElementById('export-ai-btn')
+      const originalText = btn.innerHTML
+      btn.innerHTML = '<span class="material-symbols-outlined text-[16px]">check_circle</span> Copied to Clipboard!'
+      btn.classList.replace('bg-text-main', 'bg-safe-sage')
+      setTimeout(() => {
+          btn.innerHTML = originalText
+          btn.classList.replace('bg-safe-sage', 'bg-text-main')
+      }, 2000)
   })
 
   document.getElementById('clear-sim-btn').addEventListener('click', () => {

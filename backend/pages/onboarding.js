@@ -396,8 +396,8 @@ export default function Onboarding() {
     const color = getScoreColor(result.score)
     const label = getScoreLabel(result.score)
     const dashHref = role === 'self' && result.personId
-      ? `/dashboard/detail/index.html?id=${result.personId}`
-      : '/dashboard/index.html'
+      ? `/dashboard/${result.personId}`
+      : '/dashboard'
     return (
       <>
         <PageHead title="HeatSafe — Risk Score" />

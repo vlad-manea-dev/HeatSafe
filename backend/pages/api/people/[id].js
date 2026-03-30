@@ -24,7 +24,7 @@ export default async function handler(req, res) {
       .select('*')
       .eq('person_id', id)
 
-    const base = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:3000'
+    const base = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8080'
     let weather = { currentTemp: 25, peakTemp: 32, zones: {} }
     try {
       const weatherRes = await fetch(`${base}/api/weather`)

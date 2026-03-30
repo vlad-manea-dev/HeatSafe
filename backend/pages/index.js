@@ -225,7 +225,7 @@ export default function Home({ currentTemp }) {
               Contact
             </Link>
             <Link
-              href="/dashboard/index.html"
+              href="/dashboard"
               className="font-inter font-medium text-sm text-white px-5 py-2.5 rounded-[12px]"
               style={{ background: 'linear-gradient(135deg, #af101a 0%, #d32f2f 100%)' }}
             >
@@ -454,7 +454,7 @@ export default function Home({ currentTemp }) {
               </p>
 
               <Link
-                href="/city/index.html"
+                href="/city"
                 className="font-inter font-semibold text-base text-white inline-flex items-center px-7 py-3.5 rounded-[12px]"
                 style={{ background: 'linear-gradient(135deg, #af101a 0%, #d32f2f 100%)' }}
               >
@@ -489,7 +489,7 @@ export default function Home({ currentTemp }) {
       {isLoggedIn && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
           <Link
-            href="/dashboard/index.html"
+            href="/dashboard"
             className="flex items-center gap-3 px-5 py-3 rounded-full"
             style={{
               background: 'rgba(251,249,244,0.85)',

@@ -100,6 +100,31 @@
         /* Toggle button active state */
         .layer-toggle.active { background-color: #D9383A; }
         .layer-toggle { transition: background-color 0.2s; }
+
+        /* Optimizer */
+        .opt-bar-track { background: #EAE6E1; border-radius: 9999px; height: 6px; }
+        .opt-bar-fill  { border-radius: 9999px; height: 6px; transition: width 0.5s ease; }
+
+        @keyframes pulse-ring {
+          0%   { transform: scale(1);   opacity: 0.8; }
+          100% { transform: scale(2.5); opacity: 0; }
+        }
+        .opt-marker-outer {
+          width: 20px; height: 20px;
+          border-radius: 50%;
+          background: #4A7C59;
+          border: 3px solid #fff;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+          position: relative;
+        }
+        .opt-marker-outer::before {
+          content: '';
+          position: absolute;
+          inset: -4px;
+          border-radius: 50%;
+          background: rgba(74,124,89,0.4);
+          animation: pulse-ring 1.5s ease-out infinite;
+        }
     </style>
 </head>
 <body class="bg-background-light text-text-main h-screen w-full overflow-hidden flex flex-col">
@@ -210,6 +235,57 @@
 <div class="w-3 h-3 rounded-full bg-text-main border-2 border-surface shadow-sm"></div>
 <span>Registered users by risk score</span>
 </div>
+
+<!-- Greenery Optimizer -->
+<div class="mt-8 pt-6 border-t border-border-color">
+<h3 class="font-medium text-sm text-muted uppercase tracking-wider mb-1">Greenery Optimizer</h3>
+<p class="text-xs text-muted mb-4 leading-relaxed">Find the optimal coordinate to plant new greenery based on heat intensity, green deficit, and corridor bridging potential.</p>
+<button id="run-optimizer" class="w-full flex items-center justify-center gap-2 bg-safe-sage text-white text-sm font-semibold py-2.5 px-4 rounded-lg hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">eco</span>
+Analyse Optimal Placement
+</button>
+
+<!-- Results panel — hidden until optimizer runs -->
+<div id="opt-results" class="hidden mt-4 space-y-4">
+<div class="bg-green-50 border border-green-100 rounded-lg p-4">
+<div class="flex items-start justify-between mb-1">
+<span class="text-xs font-semibold text-safe-sage uppercase tracking-wider">Recommended Location</span>
+<span id="opt-total-score" class="text-xs font-bold bg-safe-sage text-white px-2 py-0.5 rounded-full"></span>
+</div>
+<p id="opt-coords" class="font-mono text-xs text-text-main mt-1"></p>
+<p id="opt-corridor-label" class="text-xs text-muted mt-1 leading-relaxed"></p>
+</div>
+
+<div class="space-y-3">
+<div>
+<div class="flex justify-between text-xs mb-1">
+<span class="font-medium">Heat Intensity</span>
+<span id="opt-heat-val" class="text-muted"></span>
+</div>
+<div class="opt-bar-track"><div id="opt-heat-bar" class="opt-bar-fill bg-primary" style="width:0%"></div></div>
+<p class="text-[10px] text-muted mt-1">IDW-blended temperature offset at this coordinate</p>
+</div>
+<div>
+<div class="flex justify-between text-xs mb-1">
+<span class="font-medium">Green Deficit</span>
+<span id="opt-deficit-val" class="text-muted"></span>
+</div>
+<div class="opt-bar-track"><div id="opt-deficit-bar" class="opt-bar-fill bg-risk-amber" style="width:0%"></div></div>
+<p class="text-[10px] text-muted mt-1">Distance from nearest existing park or cool zone</p>
+</div>
+<div>
+<div class="flex justify-between text-xs mb-1">
+<span class="font-medium">Corridor Value</span>
+<span id="opt-corridor-val" class="text-muted"></span>
+</div>
+<div class="opt-bar-track"><div id="opt-corridor-bar" class="opt-bar-fill bg-safe-sage" style="width:0%"></div></div>
+<p class="text-[10px] text-muted mt-1">Bridges thermal gap between existing cool sinks</p>
+</div>
+</div>
+
+<button id="clear-optimizer" class="w-full text-xs text-muted hover:text-primary transition-colors py-1">Clear result</button>
+</div>
+</div>
 </div>
 <div class="p-4 border-t border-border-color bg-background-light text-center">
 <p id="last-updated" class="text-xs text-muted">Loading...</p>
@@ -223,7 +299,7 @@
 <script>
   // Force 3000 for local development
   const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'http://localhost:3000'
+    ? 'http://localhost:8080'
     : window.location.origin
 
   // Track state
@@ -468,8 +544,113 @@
     }
   }
 
+  // ── Greenery Optimizer ───────────────────────────────────────────────────
+  let optimizerLayer = L.layerGroup().addTo(map)
+  let currentCity = 'sevilla'
+
+  async function runOptimizer() {
+    const btn = document.getElementById('run-optimizer')
+    btn.disabled = true
+    btn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">autorenew</span> Analysing…'
+
+    try {
+      const res = await fetch(`${API_BASE}/api/optimize?city=${currentCity}`)
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+
+      const rec = data.recommendation
+      const { heatIntensity, greenDeficit, corridorValue } = rec.breakdown
+
+      // Update sidebar results
+      document.getElementById('opt-results').classList.remove('hidden')
+      document.getElementById('opt-total-score').textContent = `Score ${Math.round(rec.total * 100)}`
+      document.getElementById('opt-coords').textContent = `${rec.lat.toFixed(4)}°N, ${Math.abs(rec.lng).toFixed(4)}°W`
+
+      const sinkNames = data.corridorSinks.map((s) => s.name).join(' ↔ ')
+      document.getElementById('opt-corridor-label').textContent =
+        `Creates corridor: ${sinkNames}`
+
+      document.getElementById('opt-heat-val').textContent   = `${heatIntensity}/100`
+      document.getElementById('opt-deficit-val').textContent = `${greenDeficit}/100`
+      document.getElementById('opt-corridor-val').textContent = `${corridorValue}/100`
+
+      // Animate bars after a tick
+      setTimeout(() => {
+        document.getElementById('opt-heat-bar').style.width    = `${heatIntensity}%`
+        document.getElementById('opt-deficit-bar').style.width = `${greenDeficit}%`
+        document.getElementById('opt-corridor-bar').style.width = `${corridorValue}%`
+      }, 50)
+
+      // ── Map layer ──────────────────────────────────────────────────────
+      optimizerLayer.clearLayers()
+
+      // Dashed lines from recommendation to each corridor sink
+      data.corridorSinks.forEach((sink) => {
+        L.polyline(
+          [[rec.lat, rec.lng], [sink.centroid.lat, sink.centroid.lng]],
+          { color: '#4A7C59', weight: 2, dashArray: '6 5', opacity: 0.7 }
+        ).addTo(optimizerLayer)
+      })
+
+      // Top candidates as faint circles
+      data.topCandidates.slice(1).forEach((c) => {
+        L.circleMarker([c.lat, c.lng], {
+          radius: 5, color: '#4A7C59', fillColor: '#4A7C59',
+          fillOpacity: 0.15, weight: 1, opacity: 0.4,
+        }).addTo(optimizerLayer)
+      })
+
+      // Winner — pulsing green marker
+      const winnerIcon = L.divIcon({
+        className: '',
+        html: '<div class="opt-marker-outer"></div>',
+        iconSize: [20, 20],
+        iconAnchor: [10, 10],
+        popupAnchor: [0, -14],
+      })
+
+      L.marker([rec.lat, rec.lng], { icon: winnerIcon })
+        .bindPopup(`
+          <div style="font-family:'Outfit',sans-serif;min-width:190px;padding:2px">
+            <div style="font-family:'Fraunces',serif;font-weight:600;font-size:14px;margin-bottom:6px">Optimal Greenery Site</div>
+            <div style="font-size:12px;color:#8A8683;margin-bottom:8px">${rec.lat.toFixed(4)}°N, ${Math.abs(rec.lng).toFixed(4)}°W</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+              <span style="background:#D9383A;color:#fff;font-size:10px;padding:1px 6px;border-radius:999px">Heat ${heatIntensity}</span>
+              <span style="background:#E76F51;color:#fff;font-size:10px;padding:1px 6px;border-radius:999px">Deficit ${greenDeficit}</span>
+              <span style="background:#4A7C59;color:#fff;font-size:10px;padding:1px 6px;border-radius:999px">Corridor ${corridorValue}</span>
+            </div>
+            <div style="font-size:11px;color:#2C2A29">Bridges: ${sinkNames}</div>
+          </div>
+        `, { maxWidth: 240 })
+        .addTo(optimizerLayer)
+        .openPopup()
+
+      map.panTo([rec.lat, rec.lng])
+
+    } catch (err) {
+      console.error('Optimizer error:', err)
+      alert('Optimisation failed: ' + err.message)
+    } finally {
+      btn.disabled = false
+      btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">eco</span> Analyse Optimal Placement'
+    }
+  }
+
+  function clearOptimizer() {
+    optimizerLayer.clearLayers()
+    document.getElementById('opt-results').classList.add('hidden')
+    ;['opt-heat-bar','opt-deficit-bar','opt-corridor-bar'].forEach((id) => {
+      document.getElementById(id).style.width = '0%'
+    })
+  }
+
+  document.getElementById('run-optimizer').addEventListener('click', runOptimizer)
+  document.getElementById('clear-optimizer').addEventListener('click', clearOptimizer)
+
   // Handle City Switch
   document.getElementById('city-selector').addEventListener('change', function(e) {
+    currentCity = e.target.value
+    clearOptimizer()
     loadZones(e.target.value)
   })
 
