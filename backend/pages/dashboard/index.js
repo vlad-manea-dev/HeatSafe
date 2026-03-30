@@ -3,6 +3,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { fetchPeople } from '../../lib/api'
 import { getRiskColor } from '../../lib/riskHelpers'
+import NavBar from '../../components/NavBar'
 
 function getRiskMessage(person) {
   if (person.score >= 70) {
@@ -41,37 +42,11 @@ export default function DashboardList() {
       </Head>
       <div className="min-h-screen bg-[#FDFBF7] text-text flex flex-col font-body">
         {/* Header */}
-        <div className="relative flex h-auto w-full flex-col bg-white shadow-sm">
+        <NavBar activePage="dashboard" mode="user" />
+
+        <div className="relative flex h-auto w-full flex-col bg-white shadow-sm border-t border-border">
           <div className="px-4 md:px-10 lg:px-40 flex flex-1 justify-center py-5">
             <div className="flex flex-col w-full max-w-[1200px] flex-1">
-              <header className="flex items-center justify-between whitespace-nowrap border-b border-border px-4 md:px-10 py-3">
-                <div className="flex items-center gap-4 text-text">
-                  <div className="size-6 text-primary">
-                    <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                      <g clipPath="url(#clip0_6_535)">
-                        <path clipRule="evenodd" d="M47.2426 24L24 47.2426L0.757355 24L24 0.757355L47.2426 24ZM12.2426 21H35.7574L24 9.24264L12.2426 21Z" fill="currentColor" fillRule="evenodd" />
-                      </g>
-                      <defs>
-                        <clipPath id="clip0_6_535"><rect fill="white" height="48" width="48" /></clipPath>
-                      </defs>
-                    </svg>
-                  </div>
-                  <Link href="/"><h2 className="text-text text-xl font-display font-semibold leading-tight tracking-[-0.015em]">HeatSafe</h2></Link>
-                </div>
-                <div className="flex flex-1 justify-end items-center gap-8">
-                  <nav className="hidden md:flex items-center gap-9">
-                    <Link href="/dashboard" className="text-primary text-sm font-medium leading-normal border-b-2 border-primary pb-1">Dashboard</Link>
-                    <Link href="/city" className="text-muted hover:text-text transition-colors text-sm font-medium leading-normal">Map View</Link>
-                    <Link href="/enterprise" className="text-muted hover:text-text transition-colors text-sm font-medium leading-normal flex items-center gap-1">
-                      <span className="material-symbols-outlined text-[18px]">domain</span> Enterprise
-                    </Link>
-                  </nav>
-                  <div className="rounded-full size-10 border border-border bg-[#f8f6f6] flex items-center justify-center text-muted">
-                    <span className="material-symbols-outlined">person</span>
-                  </div>
-                </div>
-              </header>
-
               <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 p-4 md:px-10 mt-6">
                 <div className="flex min-w-72 flex-col gap-2">
                   <h1 className="text-text font-display text-4xl font-semibold leading-tight">

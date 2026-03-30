@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import 'leaflet/dist/leaflet.css'
+import NavBar from './NavBar'
 
 export default function CityMapClient() {
   const mapRef = useRef(null)
@@ -337,26 +338,7 @@ export default function CityMapClient() {
   return (
     <div className="bg-[#FDFBF7] text-text h-screen w-full overflow-hidden flex flex-col font-body">
       {/* Header */}
-      <header className="flex items-center justify-between whitespace-nowrap border-b border-border px-10 py-3 bg-white z-50 relative shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="size-6 text-primary">
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>thermostat</span>
-          </div>
-          <Link href="/"><h2 className="text-text text-xl font-bold leading-tight tracking-[-0.015em] font-display">HeatSafe</h2></Link>
-        </div>
-        <div className="flex flex-1 justify-end gap-8">
-          <nav className="flex items-center gap-9">
-            <Link href="/dashboard" className="text-muted hover:text-text transition-colors text-sm font-medium">Dashboard</Link>
-            <Link href="/city" className="text-primary text-sm font-medium border-b-2 border-primary pb-1">Map View</Link>
-            <Link href="/enterprise" className="text-muted hover:text-text transition-colors text-sm font-medium flex items-center gap-1">
-              <span className="material-symbols-outlined text-[18px]">domain</span> Enterprise
-            </Link>
-          </nav>
-          <div className="rounded-full size-10 bg-border flex items-center justify-center text-muted">
-            <span className="material-symbols-outlined">person</span>
-          </div>
-        </div>
-      </header>
+      <NavBar activePage="city" mode="user" />
 
       {/* Map + Sidebar */}
       <main className="flex-1 relative flex overflow-hidden">

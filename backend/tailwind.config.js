@@ -24,6 +24,8 @@ module.exports = {
       fontFamily: {
         newsreader: ['Newsreader', 'Georgia', 'serif'],
         inter: ['Inter', 'system-ui', 'sans-serif'],
+        playfair: ['"Playfair Display"', 'Georgia', 'serif'],
+        mono: ['"JetBrains Mono"', 'monospace'],
         display: ['Fraunces', 'serif'],
         body: ['Outfit', 'sans-serif'],
       },
