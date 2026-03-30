@@ -402,7 +402,7 @@ export default function Onboarding() {
       <>
         <PageHead title="HeatSafe — Risk Score" />
         <div style={{ minHeight: '100vh', backgroundColor: BG, fontFamily: 'Outfit, sans-serif', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
-          <a href="/index.html" style={{ marginBottom: '36px' }}>
+          <a href="/" style={{ marginBottom: '36px' }}>
             <img src="/assets/logo.png" alt="HeatSafe" style={{ height: '34px', mixBlendMode: 'multiply' }} />
           </a>
           <div style={{ backgroundColor: '#fff', borderRadius: '24px', padding: '48px', maxWidth: '540px', width: '100%', boxShadow: '0 8px 48px rgba(44,42,41,0.09)' }}>
@@ -444,7 +444,7 @@ export default function Onboarding() {
       <PageHead title="HeatSafe — Get started" />
       <div style={{ minHeight: '100vh', backgroundColor: BG, fontFamily: 'Outfit, sans-serif', color: GRAY }}>
         <header style={{ borderBottom: `1px solid ${BORDER}`, padding: '16px 32px', backgroundColor: '#fff' }}>
-          <a href="/index.html">
+          <a href="/">
             <img src="/assets/logo.png" alt="HeatSafe" style={{ height: '32px', mixBlendMode: 'multiply' }} />
           </a>
         </header>

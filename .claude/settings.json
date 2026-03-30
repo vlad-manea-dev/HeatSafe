@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find '/Users/callumhughes/Charm-EU Ideathon/HeatSafe' -type d -not -path */node_modules/*)",
+      "Bash(npm install:*)",
+      "Bash(npx next:*)"
+    ]
+  }
+}
