@@ -38,17 +38,30 @@ export default async function handler(req, res) {
 
   try {
     // Fetch baseline (city centre) + all zone centroids in parallel
-    const [baseline, ...zoneResults] = await Promise.all([
+    // Use allSettled so one failing zone doesn't kill the whole response
+    const [baselineResult, ...zoneResults] = await Promise.allSettled([
       fetchPoint(centroid.lat, centroid.lng),
       ...cityZones.map((z) => fetchPoint(z.centroid.lat, z.centroid.lng)),
     ])
 
+    const baseline = baselineResult.status === 'fulfilled'
+      ? baselineResult.value
+      : { currentTemp: 25, peakTemp: 30, hourly: [] }
+
     // Build zones map keyed by zoneId
     const zones = {}
     cityZones.forEach((z, i) => {
-      zones[z.zoneId] = {
-        currentTemp: zoneResults[i].currentTemp,
-        peakTemp: zoneResults[i].peakTemp,
+      if (zoneResults[i].status === 'fulfilled') {
+        zones[z.zoneId] = {
+          currentTemp: zoneResults[i].value.currentTemp,
+          peakTemp: zoneResults[i].value.peakTemp,
+        }
+      } else {
+        // Fall back to baseline temp for this zone
+        zones[z.zoneId] = {
+          currentTemp: baseline.currentTemp,
+          peakTemp: baseline.peakTemp,
+        }
       }
     })
 

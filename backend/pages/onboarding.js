@@ -82,16 +82,16 @@ function getScoreLabel(s) {
 function Input({ label, hint, ...props }) {
   const [focused, setFocused] = useState(false)
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      {label && <label style={{ fontSize: '12px', fontWeight: '700', color: GRAY, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</label>}
-      {hint && <p style={{ fontSize: '13px', color: MUTED, margin: '-4px 0 0' }}>{hint}</p>}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      {label && <label style={{ fontSize: '13px', fontWeight: '700', color: GRAY, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</label>}
+      {hint && <p style={{ fontSize: '15px', color: MUTED, margin: '-6px 0 0' }}>{hint}</p>}
       <input
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         style={{
-          width: '100%', padding: '14px 18px',
+          width: '100%', padding: '18px 22px',
           border: `1.5px solid ${focused ? PRIMARY : BORDER}`,
-          borderRadius: '10px', fontSize: '16px',
+          borderRadius: '12px', fontSize: '18px',
           fontFamily: 'Outfit, sans-serif', outline: 'none',
           backgroundColor: '#fff', color: GRAY, boxSizing: 'border-box',
           transition: 'border-color 0.15s',
@@ -104,8 +104,8 @@ function Input({ label, hint, ...props }) {
 
 function Toggle({ label, checked, onChange }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0' }}>
-      <span style={{ fontSize: '16px', color: GRAY }}>{label}</span>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 0' }}>
+      <span style={{ fontSize: '18px', color: GRAY }}>{label}</span>
       <button
         type="button"
         onClick={() => onChange(!checked)}
@@ -143,15 +143,15 @@ function Dropdown({ label, placeholder, options, value, onChange }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }} ref={ref}>
-      {label && <label style={{ fontSize: '12px', fontWeight: '700', color: GRAY, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</label>}
+      {label && <label style={{ fontSize: '13px', fontWeight: '700', color: GRAY, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</label>}
       <div style={{ position: 'relative' }}>
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
           style={{
-            width: '100%', padding: '14px 18px',
+            width: '100%', padding: '18px 22px',
             border: `1.5px solid ${open ? PRIMARY : BORDER}`,
-            borderRadius: '10px', fontSize: '16px',
+            borderRadius: '12px', fontSize: '18px',
             fontFamily: 'Outfit, sans-serif',
             backgroundColor: '#fff', color: selected ? GRAY : MUTED,
             cursor: 'pointer', outline: 'none',
@@ -181,11 +181,11 @@ function Dropdown({ label, placeholder, options, value, onChange }) {
                   type="button"
                   onClick={() => { onChange(opt.value); setOpen(false) }}
                   style={{
-                    width: '100%', padding: '13px 18px',
+                    width: '100%', padding: '15px 22px',
                     backgroundColor: isSelected ? PRIMARY_LIGHT : 'transparent',
                     color: isSelected ? PRIMARY : GRAY,
                     fontWeight: isSelected ? '600' : '400',
-                    fontSize: '15px', fontFamily: 'Outfit, sans-serif',
+                    fontSize: '17px', fontFamily: 'Outfit, sans-serif',
                     border: 'none', cursor: 'pointer', textAlign: 'left',
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                     transition: 'background 0.1s',
@@ -244,22 +244,22 @@ function StepIndicator({ current }) {
 
 function NavButtons({ onBack, onNext, nextLabel = 'Continue', nextDisabled = false, extra = null }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '40px' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '52px' }}>
       {onBack ? (
-        <button onClick={onBack} style={{ padding: '14px 28px', background: 'transparent', color: MUTED, border: `1.5px solid ${BORDER}`, borderRadius: '9999px', fontSize: '15px', fontWeight: '500', cursor: 'pointer', fontFamily: 'Outfit, sans-serif' }}>
+        <button onClick={onBack} style={{ padding: '17px 36px', background: 'transparent', color: MUTED, border: `1.5px solid ${BORDER}`, borderRadius: '9999px', fontSize: '17px', fontWeight: '500', cursor: 'pointer', fontFamily: 'Outfit, sans-serif' }}>
           ← Back
         </button>
       ) : <div />}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
         {extra}
         <button
           onClick={onNext}
           disabled={nextDisabled}
           style={{
-            padding: '14px 36px',
+            padding: '17px 48px',
             backgroundColor: nextDisabled ? '#D1D5DB' : PRIMARY,
             color: '#fff', border: 'none', borderRadius: '9999px',
-            fontSize: '15px', fontWeight: '600',
+            fontSize: '17px', fontWeight: '600',
             cursor: nextDisabled ? 'not-allowed' : 'pointer',
             fontFamily: 'Outfit, sans-serif', transition: 'background 0.15s',
           }}
@@ -273,9 +273,9 @@ function NavButtons({ onBack, onNext, nextLabel = 'Continue', nextDisabled = fal
 
 function Heading({ title, sub }) {
   return (
-    <div style={{ marginBottom: '36px' }}>
-      <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '40px', fontWeight: '600', lineHeight: '1.15', color: GRAY, margin: '0 0 10px' }}>{title}</h1>
-      {sub && <p style={{ color: MUTED, fontSize: '16px', margin: 0, lineHeight: '1.5' }}>{sub}</p>}
+    <div style={{ marginBottom: '44px' }}>
+      <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '52px', fontWeight: '600', lineHeight: '1.1', color: GRAY, margin: '0 0 14px' }}>{title}</h1>
+      {sub && <p style={{ color: MUTED, fontSize: '18px', margin: 0, lineHeight: '1.6' }}>{sub}</p>}
     </div>
   )
 }
@@ -449,27 +449,27 @@ export default function Onboarding() {
           </a>
         </header>
 
-        <main style={{ maxWidth: '680px', margin: '0 auto', padding: '56px 32px 100px' }}>
+        <main style={{ maxWidth: '860px', margin: '0 auto', padding: '64px 48px 120px' }}>
           <StepIndicator current={step} />
 
           {/* ── Step 1: Role ── */}
           {step === 1 && (
             <div>
               <Heading title="Who are you protecting?" sub="We'll personalise everything to the right person." />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '28px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '36px' }}>
                 {[
                   { value: 'self', icon: 'person', title: 'Myself', sub: 'Set up your own personal heat risk profile' },
                   { value: 'carer', icon: 'favorite', title: 'Someone I care for', sub: 'Set up a profile for a family member or someone vulnerable' },
                 ].map((opt) => (
                   <button key={opt.value} type="button" onClick={() => setRole(opt.value)} style={{
-                    padding: '28px 24px', borderRadius: '16px', textAlign: 'left', cursor: 'pointer',
+                    padding: '36px 30px', borderRadius: '20px', textAlign: 'left', cursor: 'pointer',
                     border: `2px solid ${role === opt.value ? PRIMARY : BORDER}`,
                     backgroundColor: role === opt.value ? PRIMARY_LIGHT : '#fff',
                     outline: 'none', transition: 'all 0.15s',
                   }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: '36px', color: role === opt.value ? PRIMARY : MUTED, display: 'block', marginBottom: '16px', fontVariationSettings: "'FILL' 1" }}>{opt.icon}</span>
-                    <p style={{ fontWeight: '700', fontSize: '17px', color: GRAY, margin: '0 0 6px' }}>{opt.title}</p>
-                    <p style={{ fontSize: '14px', color: MUTED, lineHeight: '1.5', margin: 0 }}>{opt.sub}</p>
+                    <span className="material-symbols-outlined" style={{ fontSize: '44px', color: role === opt.value ? PRIMARY : MUTED, display: 'block', marginBottom: '20px', fontVariationSettings: "'FILL' 1" }}>{opt.icon}</span>
+                    <p style={{ fontWeight: '700', fontSize: '20px', color: GRAY, margin: '0 0 8px' }}>{opt.title}</p>
+                    <p style={{ fontSize: '16px', color: MUTED, lineHeight: '1.5', margin: 0 }}>{opt.sub}</p>
                   </button>
                 ))}
               </div>
@@ -528,12 +528,12 @@ export default function Onboarding() {
                 title={role === 'self' ? 'Your health conditions' : `${caredForName}'s health conditions`}
                 sub="This helps us personalise the risk score. Select all that apply."
               />
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', marginBottom: '8px' }}>
                 {CONDITION_OPTIONS.map((cond) => {
                   const selected = conditions.includes(cond.value)
                   return (
                     <button key={cond.value} type="button" onClick={() => toggleCondition(cond.value)} style={{
-                      padding: '13px 22px', borderRadius: '9999px', fontSize: '15px',
+                      padding: '16px 28px', borderRadius: '9999px', fontSize: '17px',
                       border: `2px solid ${selected ? PRIMARY : BORDER}`,
                       backgroundColor: selected ? PRIMARY_LIGHT : '#fff',
                       color: selected ? PRIMARY : GRAY,

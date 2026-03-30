@@ -25,8 +25,11 @@ export default async function handler(req, res) {
       .eq('person_id', id)
 
     const base = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:3000'
-    const weatherRes = await fetch(`${base}/api/weather`)
-    const weather = await weatherRes.json()
+    let weather = { currentTemp: 25, peakTemp: 32, zones: {} }
+    try {
+      const weatherRes = await fetch(`${base}/api/weather`)
+      if (weatherRes.ok) weather = await weatherRes.json()
+    } catch (_) { /* use fallback temp */ }
 
     // Use zone-specific temp
     const zoneId = person.zone_id
