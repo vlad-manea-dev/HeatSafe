@@ -1,14 +1,23 @@
 // Spanish Heat Zones by City - Expanded for High Resolution
 const heatZonesByCity = {
   sevilla: [
+    // Severe heat zones (+3°C and above)
     { zoneId: 'casco-antiguo', name: 'Casco Antiguo', nominatimQuery: 'Casco Antiguo, Sevilla, Spain', centroid: { lat: 37.3920, lng: -5.9875 }, offset: +4.8, reason: 'Medieval stone density.', color: '#D9383A', riskLevel: 'severe' },
     { zoneId: 'santa-cruz', name: 'Barrio Santa Cruz', nominatimQuery: 'Santa Cruz, Sevilla, Spain', centroid: { lat: 37.3850, lng: -5.9905 }, offset: +5.2, reason: 'Hottest district.', color: '#D9383A', riskLevel: 'severe' },
     { zoneId: 'triana', name: 'Triana', nominatimQuery: 'Triana, Sevilla, Spain', centroid: { lat: 37.3875, lng: -6.0040 }, offset: +3.5, reason: 'Riverside sun exposure.', color: '#D9383A', riskLevel: 'severe' },
+    { zoneId: 'macarena', name: 'La Macarena', nominatimQuery: 'La Macarena, Sevilla, Spain', centroid: { lat: 37.4030, lng: -5.9870 }, offset: +3.0, reason: 'Dense social housing blocks.', color: '#D9383A', riskLevel: 'severe' },
+    { zoneId: 'cerro-del-aguila', name: 'Cerro del Águila', nominatimQuery: 'Cerro del Águila, Sevilla, Spain', centroid: { lat: 37.3780, lng: -5.9620 }, offset: +4.0, reason: 'Low green cover, asphalt density.', color: '#D9383A', riskLevel: 'severe' },
+    { zoneId: 'san-pablo', name: 'San Pablo-Santa Justa', nominatimQuery: 'San Pablo-Santa Justa, Sevilla, Spain', centroid: { lat: 37.3950, lng: -5.9720 }, offset: +3.2, reason: 'Rail corridor heat trap.', color: '#D9383A', riskLevel: 'severe' },
+    // Elevated heat zones (+1 to +3°C)
     { zoneId: 'los-remedios', name: 'Los Remedios', nominatimQuery: 'Los Remedios, Sevilla, Spain', centroid: { lat: 37.3735, lng: -6.0000 }, offset: +2.8, reason: 'High-albedo avenues.', color: '#E76F51', riskLevel: 'elevated' },
     { zoneId: 'nervion', name: 'Nervión', nominatimQuery: 'Nervión, Sevilla, Spain', centroid: { lat: 37.3915, lng: -5.9680 }, offset: +2.2, reason: 'Modern residential density.', color: '#E76F51', riskLevel: 'elevated' },
-    { zoneId: 'macarena', name: 'La Macarena', nominatimQuery: 'La Macarena, Sevilla, Spain', centroid: { lat: 37.4030, lng: -5.9870 }, offset: +3.0, reason: 'Dense social housing blocks.', color: '#D9383A', riskLevel: 'severe' },
-    { zoneId: 'parque-maria-luisa', name: 'Parque de María Luisa', nominatimQuery: 'Parque de María Luisa, Sevilla, Spain', centroid: { lat: 37.3748, lng: -5.9877 }, offset: -2.2, reason: 'Green lung cooling.', color: '#4A7C59', riskLevel: 'cool' },
-    { zoneId: 'alamillo', name: 'Parque del Alamillo', nominatimQuery: 'Parque del Alamillo, Sevilla, Spain', centroid: { lat: 37.4140, lng: -6.0000 }, offset: -1.8, reason: 'Riverside park.', color: '#4A7C59', riskLevel: 'cool' }
+    { zoneId: 'san-bernardo', name: 'San Bernardo', nominatimQuery: 'San Bernardo, Sevilla, Spain', centroid: { lat: 37.3810, lng: -5.9790 }, offset: +2.5, reason: 'Dense residential, low canopy.', color: '#E76F51', riskLevel: 'elevated' },
+    { zoneId: 'bellavista', name: 'Bellavista-La Palmera', nominatimQuery: 'Bellavista, Sevilla, Spain', centroid: { lat: 37.3580, lng: -5.9800 }, offset: +1.8, reason: 'Southern residential sprawl.', color: '#E76F51', riskLevel: 'elevated' },
+    { zoneId: 'pino-montano', name: 'Pino Montano', nominatimQuery: 'Pino Montano, Sevilla, Spain', centroid: { lat: 37.4180, lng: -5.9920 }, offset: +2.0, reason: 'Northern residential blocks.', color: '#E76F51', riskLevel: 'elevated' },
+    { zoneId: 'bermejales', name: 'Los Bermejales', nominatimQuery: 'Los Bermejales, Sevilla, Spain', centroid: { lat: 37.3620, lng: -5.9920 }, offset: +1.5, reason: 'Modern low-density residential.', color: '#E76F51', riskLevel: 'elevated' },
+    // Cooler zones (parks — still warm, just less so)
+    { zoneId: 'parque-maria-luisa', name: 'Parque de María Luisa', nominatimQuery: 'Parque de María Luisa, Sevilla, Spain', centroid: { lat: 37.3748, lng: -5.9877 }, offset: -2.2, reason: 'Green lung cooling.', color: '#F4A261', riskLevel: 'cool' },
+    { zoneId: 'alamillo', name: 'Parque del Alamillo', nominatimQuery: 'Parque del Alamillo, Sevilla, Spain', centroid: { lat: 37.4140, lng: -6.0000 }, offset: -1.8, reason: 'Riverside park.', color: '#F4A261', riskLevel: 'cool' },
   ],
   madrid: [
     { zoneId: 'sol', name: 'Puerta del Sol', nominatimQuery: 'Sol, Madrid, Spain', centroid: { lat: 40.4168, lng: -3.7038 }, offset: +5.5, reason: 'Zero shade, extreme asphalt.', color: '#D9383A', riskLevel: 'severe' },

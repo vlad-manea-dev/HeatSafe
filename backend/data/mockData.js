@@ -9,31 +9,31 @@ const mockAlerts = {
       {
         time: '08:00',
         message:
-          'Buenos días María. Sevilla alcanzará 38°C hoy. Empiece a beber agua ahora — al menos 2 litros antes del mediodía.',
+          'Good morning María. Seville will reach 38°C today. Start drinking water now — at least 2 litres before midday.',
       },
       {
         time: '11:00',
         message:
-          'La temperatura sube a 33°C. Tome sus diuréticos con un vaso lleno de agua. Cierre las persianas de las ventanas orientadas al sur.',
+          'Temperature rising to 33°C. Take your diuretics with a full glass of water. Close the shutters on south-facing windows.',
       },
       {
         time: '13:30',
         message:
-          'Sevilla está a 36°C. Su piso en el último piso será varios grados más caliente. Vaya a la habitación más fresca y evite salir.',
+          'Seville is at 36°C. Your top-floor flat will be several degrees hotter. Move to the coolest room and avoid going outside.',
       },
       {
         time: '15:00',
         message:
-          'Alerta de calor máximo: 38°C. Con su afección cardíaca y medicamentos, este es un riesgo alto. Descanse completamente. Llame a su familia si se siente mal.',
+          'Peak heat alert: 38°C. With your heart condition and medications, this is high risk. Rest completely. Call family if you feel unwell.',
       },
       {
         time: '18:00',
         message:
-          'La temperatura baja a 32°C. Puede abrir las ventanas ahora. Bien hecho por mantenerse segura hoy, María.',
+          'Temperature dropping to 32°C. You can open the windows now. Well done staying safe today, María.',
       },
     ],
     carer_alert:
-      "HeatSafe: La puntuación de riesgo de María García es 100/100 hoy. Pico en Sevilla 38°C. Por favor compruebe — su piso en el último piso estará a 41°C+ esta tarde.",
+      "HeatSafe: María García's risk score is 100/100 today. Seville peak 38°C. Please check in — her top-floor flat will be 41°C+ this afternoon.",
   },
 
   'aaaaaaaa-0000-0000-0000-000000000002': {
@@ -42,15 +42,76 @@ const mockAlerts = {
       {
         time: '09:00',
         message:
-          'Pablo — previsión de 38°C en Sevilla hoy. Tienes bajo riesgo, pero mantente hidratado y usa protector solar si sales.',
+          'Pablo — forecast of 38°C in Seville today. You are low risk, but stay hydrated and wear sunscreen if you go out.',
       },
       {
         time: '14:00',
         message:
-          'Calor máximo a 38°C. Tu piso en planta baja se mantiene más fresco que la mayoría. Mantén las ventanas abiertas para ventilación cruzada.',
+          'Peak heat at 38°C. Your ground-floor flat stays cooler than most. Keep windows open for cross-ventilation.',
       },
     ],
     carer_alert: null,
+  },
+
+  'aaaaaaaa-0000-0000-0000-000000000003': {
+    // Carmen Ruiz — HIGH RISK
+    alerts: [
+      {
+        time: '07:30',
+        message:
+          'Good morning Carmen. Seville peaks at 39°C today. Your antipsychotic impairs sweating — drink water every 30 minutes.',
+      },
+      {
+        time: '11:00',
+        message:
+          'Temperature at 34°C. Take your ACE inhibitor with a full glass of water. Close all shutters now.',
+      },
+      {
+        time: '13:00',
+        message:
+          'Casco Antiguo is 5°C hotter than the city average. Stay in your coolest room. Do not go outside until after 7pm.',
+      },
+      {
+        time: '16:00',
+        message:
+          'Still 37°C. Place a damp cloth on your neck and wrists. If you feel dizzy or confused, call 112 immediately.',
+      },
+      {
+        time: '19:00',
+        message:
+          'Cooling to 31°C. You can open windows for ventilation. Keep drinking water through the evening, Carmen.',
+      },
+    ],
+    carer_alert:
+      "HeatSafe: Carmen Ruiz's risk score is 88/100 today. She is in Casco Antiguo (+5°C hotspot). Please call to check on her this afternoon.",
+  },
+
+  'aaaaaaaa-0000-0000-0000-000000000004': {
+    // Antonio López — HIGH RISK
+    alerts: [
+      {
+        time: '08:00',
+        message:
+          'Good morning Antonio. Seville will hit 38°C. Your beta-blocker limits heat response — avoid all exertion today.',
+      },
+      {
+        time: '12:00',
+        message:
+          'Temperature at 35°C in La Macarena. Check your blood sugar — heat affects insulin. Drink water with each check.',
+      },
+      {
+        time: '14:30',
+        message:
+          'Peak heat: 38°C. Your south-facing flat traps heat. Move to the north side. Use a fan if you have one.',
+      },
+      {
+        time: '18:00',
+        message:
+          'Cooling to 33°C. You can open windows now. Have a light meal and keep hydrating, Antonio.',
+      },
+    ],
+    carer_alert:
+      "HeatSafe: Antonio López's risk score is 72/100 today. He has limited mobility and diabetes. Please check he has water and food within reach.",
   },
 }
 

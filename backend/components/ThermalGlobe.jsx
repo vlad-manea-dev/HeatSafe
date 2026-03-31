@@ -63,23 +63,23 @@ const LABELS = [
   { lat: -2, lng: 58, text: "Arabian\nSea", size: 0.45 },
 ]
 
-const heatmapColorFn = (t) => {
-  if (t < 0.15) return `rgba(245, 215, 150, ${0.1 + t * 2})`
-  if (t < 0.35) {
-    const f = (t - 0.15) / 0.2
-    return `rgba(245, ${200 - 60 * f}, ${110 - 60 * f}, ${0.4 + 0.2 * f})`
+const heatmapColorFn = useCallback((dataset) => {
+  return (t) => {
+    // Low intensity: soft yellow
+    if (t < 0.3) {
+      const f = t / 0.3
+      return `rgba(255, 230, 150, ${0.2 + f * 0.4})`
+    }
+    // Mid intensity: vibrant orange
+    if (t < 0.7) {
+      const f = (t - 0.3) / 0.4
+      return `rgba(255, ${200 - 100 * f}, 50, ${0.6 + f * 0.25})`
+    }
+    // High intensity: deep red/crimson
+    const f = (t - 0.7) / 0.3
+    return `rgba(${255 - 80 * f}, ${100 - 90 * f}, ${50 - 40 * f}, ${0.85 + f * 0.15})`
   }
-  if (t < 0.6) {
-    const f = (t - 0.35) / 0.25
-    return `rgba(${235 - 60 * f}, ${120 - 80 * f}, ${50 + 40 * f}, ${0.6 + 0.15 * f})`
-  }
-  if (t < 0.8) {
-    const f = (t - 0.6) / 0.2
-    return `rgba(${175 - 80 * f}, ${40 - 30 * f}, ${90 + 80 * f}, ${0.75 + 0.1 * f})`
-  }
-  const f = (t - 0.8) / 0.2
-  return `rgba(${95 - 45 * f}, 10, ${170 + 40 * f}, ${0.85 + 0.1 * f})`
-}
+}, [])
 
 export default function ThermalGlobe() {
   const globeRef = useRef(null)
@@ -122,30 +122,15 @@ export default function ThermalGlobe() {
   // Configure globe after it mounts
   const onGlobeReady = useCallback(() => {
     const globe = globeRef.current
-    if (!globe || typeof globe.pointOfView !== "function") return
-
-    globe.pointOfView({ lat: 8, lng: 25, altitude: 1.35 }, 0)
+    if (!globe) return
 
     const controls = globe.controls()
     if (controls) {
       controls.autoRotate = true
       controls.autoRotateSpeed = 0.25
-      controls.enableZoom = false
-      controls.enablePan = false
-      controls.enableRotate = false
-    }
-
-    // Tint the globe base material to warm cream
-    const scene = globe.scene()
-    if (scene) {
-      scene.traverse((obj) => {
-        if (obj.isMesh && obj.material) {
-          // The base globe sphere (no map texture = first mesh)
-          if (!obj.material.map) {
-            obj.material.color?.set?.("#ede4d1")
-          }
-        }
-      })
+      controls.enableZoom = true
+      controls.enablePan = true
+      controls.enableRotate = true
     }
   }, [])
 
@@ -161,25 +146,27 @@ export default function ThermalGlobe() {
           width={dims.width}
           height={dims.height}
           // Warm beige base (tiny data-URL pixel)
-          globeImageUrl="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3Crect fill='%23ede4d1' width='1' height='1'/%3E%3C/svg%3E"
+          globeImageUrl="https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-day.png"
+          bumpImageUrl="https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png"
           backgroundColor="rgba(0,0,0,0)"
           showAtmosphere={true}
-          atmosphereColor="rgba(240,232,216,0.35)"
-          atmosphereAltitude={0.2}
-          animateIn={false}
-          // Country polygons
+          atmosphereColor="rgba(253, 251, 247, 0.38)"
+          atmosphereAltitude={0.16}
+          animateIn={true}
+          // Country polygons as outlines
           polygonsData={countries}
-          polygonCapColor={() => "rgba(228, 218, 196, 0.7)"}
+          polygonCapColor={() => "rgba(0,0,0,0)"}
           polygonSideColor={() => "rgba(0,0,0,0)"}
-          polygonStrokeColor={() => "rgba(100, 85, 60, 0.35)"}
-          polygonAltitude={0.005}
+          polygonStrokeColor={() => "rgba(246, 237, 218, 0.7)"}
+          polygonStrokeWidth={0.45}
+          polygonAltitude={0.001}
           // Heatmap
           heatmapsData={[heatmapData]}
           heatmapPointLat="lat"
           heatmapPointLng="lng"
           heatmapPointWeight="value"
           heatmapBandwidth={5.5}
-          heatmapColorFn={() => heatmapColorFn}
+          heatmapColorFn={heatmapColorFn}
           heatmapColorSaturation={2.5}
           heatmapBaseAltitude={0.006}
           heatmapTopAltitude={0.06}

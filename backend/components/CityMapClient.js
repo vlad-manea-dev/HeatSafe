@@ -17,7 +17,7 @@ export default function CityMapClient() {
   const [currentHour, setCurrentHour] = useState(new Date().getHours())
   const [severeCount, setSevereCount] = useState(0)
   const [lastUpdated, setLastUpdated] = useState('Loading...')
-  const [surfaceVisible, setSurfaceVisible] = useState(true)
+  const [surfaceVisible, setSurfaceVisible] = useState(false)
   const [zonesVisible, setZonesVisible] = useState(true)
   const [usersVisible, setUsersVisible] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -50,9 +50,11 @@ export default function CityMapClient() {
   }
   function tempToColor(temp) {
     if (temp >= 42) return '#D9383A'
-    if (temp >= 36) return '#E76F51'
-    if (temp >= 28) return '#F4A261'
-    return '#4A7C59'
+    if (temp >= 38) return '#E05545'
+    if (temp >= 34) return '#E76F51'
+    if (temp >= 30) return '#F4A261'
+    if (temp >= 26) return '#F2C57C'
+    return '#EDD9A3'
   }
   function offsetIcon(offset) { return offset > 0 ? '🔥' : '❄️' }
 
@@ -79,7 +81,7 @@ export default function CityMapClient() {
     const HeatSurface = L.Layer.extend({
       onAdd(m) {
         this._container = L.DomUtil.create('canvas', 'leaflet-zoom-animated')
-        this._container.style.opacity = '0.45'
+        this._container.style.opacity = '0.55'
         this._container.style.pointerEvents = 'none'
         this._container.style.zIndex = '1'
         m.getPanes().overlayPane.appendChild(this._container)
@@ -117,7 +119,6 @@ export default function CityMapClient() {
     })
 
     const surface = new HeatSurface()
-    surface.addTo(heatSurfaceLayer)
     heatSurfaceRef.current = surface
 
     return () => {

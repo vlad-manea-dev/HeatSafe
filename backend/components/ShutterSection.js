@@ -212,7 +212,7 @@ export default function ShutterSection() {
         />
         <HeartSVG />
 
-        <div style={{ textAlign: 'center', maxWidth: '340px' }}>
+        <div style={{ textAlign: 'center', maxWidth: '340px', position: 'relative', zIndex: 10 }}>
           <h2
             className="font-newsreader"
             style={{
@@ -343,7 +343,7 @@ export default function ShutterSection() {
         />
         <BuildingSVG />
 
-        <div style={{ textAlign: 'center', maxWidth: '340px' }}>
+        <div style={{ textAlign: 'center', maxWidth: '340px', position: 'relative', zIndex: 10 }}>
           <h2
             className="font-newsreader"
             style={{

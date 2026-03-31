@@ -1,16 +1,12 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Link from 'next/link'
 import { createClient } from '@supabase/supabase-js'
 import dynamic from 'next/dynamic'
-import createGlobe from 'cobe'
 
 const MapShowcase = dynamic(
   () => import('../components/MapShowcase'),
-  { ssr: false }
-)
-const ThermalGlobe = dynamic(
-  () => import('../components/ThermalGlobe'),
   { ssr: false }
 )
 import ShutterSection from '../components/ShutterSection'
@@ -20,7 +16,7 @@ import ShutterSection from '../components/ShutterSection'
 function IconFlame({ className }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 23c-4.97 0-8-3.58-8-7.5 0-3.07 2.17-5.65 3.5-7.28C9.15 6.28 10.54 4.34 11 2c.68 1.63 2.06 3.36 3.5 5.22C15.84 8.85 20 12.43 20 15.5 20 19.42 16.97 23 12 23zm0-2c3.31 0 6-2.24 6-5.5 0-2.04-2.38-4.7-4.14-6.7-.6-.68-1.16-1.32-1.58-1.93-.35.79-.87 1.58-1.47 2.38C9.2 11.37 6 14.03 6 15.5 6 18.76 8.69 21 12 21z"/>
+      <path d="M12,2C12,2 12,7 12,7C12,7 13.5,6 15,7C16.5,8 17,11 17,13C17,17 14,20 12,20C10,20 7,17 7,13C7,11 7.5,8 9,7C10.5,6 12,7 12,7C12,7 12,2 12,2Z" />
     </svg>
   )
 }
@@ -36,119 +32,11 @@ function IconGrid({ className }) {
   )
 }
 
-// ─── Globe Component (cobe) ───────────────────────────────────────────────────
-
-function HeatGlobe() {
-  const canvasRef = useRef(null)
-  const pointerInteracting = useRef(null)
-  const pointerInteractionMovement = useRef(0)
-  const phiRef = useRef(0)
-  const globeRef = useRef(null)
-
-  const onPointerDown = useCallback((e) => {
-    pointerInteracting.current = e.clientX - pointerInteractionMovement.current
-    if (canvasRef.current) canvasRef.current.style.cursor = 'grabbing'
-  }, [])
-
-  const onPointerUp = useCallback(() => {
-    pointerInteracting.current = null
-    if (canvasRef.current) canvasRef.current.style.cursor = 'grab'
-  }, [])
-
-  const onPointerOut = useCallback(() => {
-    pointerInteracting.current = null
-    if (canvasRef.current) canvasRef.current.style.cursor = 'grab'
-  }, [])
-
-  const onMouseMove = useCallback((e) => {
-    if (pointerInteracting.current !== null) {
-      const delta = e.clientX - pointerInteracting.current
-      pointerInteractionMovement.current = delta
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!canvasRef.current) return
-
-    // Set explicit pixel dimensions on the canvas before creating the globe
-    const size = 800
-    canvasRef.current.width = size * 2
-    canvasRef.current.height = size * 2
-
-    const globe = createGlobe(canvasRef.current, {
-      devicePixelRatio: 2,
-      width: size * 2,
-      height: size * 2,
-      phi: 0,
-      theta: 0.25,
-      dark: 0.25,
-      diffuse: 1.4,
-      scale: 0.98,
-      mapSamples: 42000,
-      mapBrightness: 1.2,
-      baseColor: [0.05, 0.1, 0.16],
-      markerColor: [1, 0.15, 0.15],
-      glowColor: [0.04, 0.06, 0.08],
-      offset: [0, 0],
-      markers: [
-        { location: [35.68, -5.9], size: 0.04 },      // Morocco
-        { location: [30.04, 31.24], size: 0.05 },      // Cairo
-        { location: [28.61, 77.21], size: 0.06 },      // Delhi
-        { location: [25.20, 55.27], size: 0.04 },      // Dubai
-        { location: [23.42, 53.85], size: 0.03 },      // UAE
-        { location: [15.32, 44.21], size: 0.03 },      // Yemen
-        { location: [12.97, 77.59], size: 0.04 },      // Bangalore
-        { location: [36.74, 3.09], size: 0.03 },       // Algeria
-        { location: [13.76, 100.50], size: 0.03 },     // Bangkok
-        { location: [-1.29, 36.82], size: 0.03 },      // Nairobi
-        { location: [6.52, 3.38], size: 0.03 },        // Lagos
-        { location: [41.90, 12.50], size: 0.03 },      // Rome
-        { location: [53.35, -6.26], size: 0.02 },      // Dublin
-        { location: [40.42, -3.70], size: 0.04 },      // Madrid
-        { location: [37.39, -5.98], size: 0.04 },      // Seville
-        { location: [33.87, 151.21], size: 0.03 },     // Sydney
-        { location: [24.47, 54.37], size: 0.03 },      // Abu Dhabi
-        { location: [19.08, 72.88], size: 0.05 },      // Mumbai
-      ],
-      onRender: (state) => {
-        if (pointerInteracting.current === null) {
-          phiRef.current += 0.003
-        } else {
-          phiRef.current += pointerInteractionMovement.current / 200
-        }
-        state.phi = phiRef.current
-      },
-    })
-    globeRef.current = globe
-
-    return () => {
-      globe.destroy()
-    }
-  }, [])
-
-  return (
-    <div className="reveal relative w-[600px] h-[600px] md:w-[750px] md:h-[750px] lg:w-[900px] lg:h-[900px] flex items-center justify-center">
-      <canvas
-        ref={canvasRef}
-        onPointerDown={onPointerDown}
-        onPointerUp={onPointerUp}
-        onPointerOut={onPointerOut}
-        onMouseMove={onMouseMove}
-        style={{
-          width: 800,
-          height: 800,
-          maxWidth: '100%',
-          cursor: 'grab',
-          aspectRatio: '1',
-        }}
-      />
-    </div>
-  )
-}
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function Home({ currentTemp }) {
+export default function Home() {
+  const router = useRouter()
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const heroRef = useRef(null)
 
@@ -192,52 +80,49 @@ export default function Home({ currentTemp }) {
         <nav
           style={{
             position:             'fixed',
-            top:                  '1.75rem',
+            top:                  '2.5rem',
             left:                 '50%',
             transform:            'translateX(-50%)',
             zIndex:               100,
             display:              'flex',
             alignItems:           'center',
             justifyContent:       'space-between',
-            width:                'min(92vw, 1100px)',
-            background:           'rgba(251,249,244,0.75)',
-            backdropFilter:       'blur(32px)',
-            WebkitBackdropFilter: 'blur(32px)',
+            width:                'min(94vw, 1200px)',
+            background:           'rgba(255,255,255,0.4)',
+            backdropFilter:       'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
             borderRadius:         '100px',
-            border:               '1px solid rgba(27,28,25,0.06)',
-            boxShadow:            '0 8px 30px -8px rgba(0,0,0,0.06)',
-            padding:              '0.45rem 0.5rem 0.45rem 1.5rem',
+            border:               '1px solid rgba(255,255,255,0.4)',
+            boxShadow:            '0 4px 30px rgba(0,0,0,0.03)',
+            padding:              '0.45rem 0.5rem 0.45rem 2rem',
             whiteSpace:           'nowrap',
           }}
         >
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
-            <span style={{ width: 22, height: 22, borderRadius: '50%', background: '#af101a', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <IconFlame className="w-3 h-3 text-white" />
-            </span>
-            <span className="font-fraunces font-semibold text-[1.1rem] text-[#1b1c19] tracking-tight">
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
+            <IconFlame className="w-6 h-6 text-[#af101a]" />
+            <span className="font-fraunces font-semibold text-[1.25rem] text-[#1b1c19] tracking-tight">
               HeatSafe
             </span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-2">
-            <Link href="/dashboard" className="font-outfit font-medium text-[0.95rem] text-[#1b1c19]/70 hover:text-[#1b1c19] transition-colors px-4 py-1">Solutions</Link>
-            <Link href="/city" className="font-outfit font-medium text-[0.95rem] text-[#1b1c19]/70 hover:text-[#1b1c19] transition-colors px-4 py-1">Data</Link>
-            <Link href="#how-it-works" className="font-outfit font-medium text-[0.95rem] text-[#1b1c19]/70 hover:text-[#1b1c19] transition-colors px-4 py-1">About</Link>
+          <div className="hidden md:flex items-center gap-4">
+            <Link href="/dashboard" className="font-outfit font-medium text-[1rem] text-[#1b1c19] hover:opacity-60 transition-opacity px-4 py-1">Solutions</Link>
+            <Link href="/city" className="font-outfit font-medium text-[1rem] text-[#1b1c19] hover:opacity-60 transition-opacity px-4 py-1">Data</Link>
+            <Link href="#how-it-works" className="font-outfit font-medium text-[1rem] text-[#1b1c19] hover:opacity-60 transition-opacity px-4 py-1">About</Link>
           </div>
 
           <div className="flex items-center">
             <Link
-              href="/onboarding"
-              className="font-outfit font-semibold text-[0.95rem] text-white"
+              href="/dashboard"
+              className="font-outfit font-bold text-[1rem] text-white"
               style={{
                 background: '#af101a',
-                padding: '0.65rem 1.8rem',
+                padding: '0.75rem 2rem',
                 borderRadius: '100px',
                 textDecoration: 'none',
-                boxShadow: '0 4px 12px rgba(175, 16, 26, 0.2)'
               }}
             >
-              Get Started
+              Login
             </Link>
           </div>
         </nav>
@@ -249,18 +134,18 @@ export default function Home({ currentTemp }) {
             height:         '100vh',
             display:        'flex',
             alignItems:     'center',
-            padding:        '0 5vw',
+            padding:        '0 8vw',
             position:       'relative',
             overflow:       'hidden'
           }}
         >
           {/* Left Content */}
-          <div style={{ flex: 1, zIndex: 10, maxWidth: '750px', textAlign: 'left' }}>
+          <div style={{ flex: 1, zIndex: 10, maxWidth: '900px', textAlign: 'left' }}>
             {/* Headline */}
-            <h1 className="reveal" style={{ margin: '0 0 1.5rem', lineHeight: 1.05 }}>
+            <h1 className="reveal" style={{ margin: '0 0 1.25rem', lineHeight: 0.95 }}>
               <span
                 className="font-fraunces"
-                style={{ color: '#1b1c19', fontSize: 'clamp(4rem, 7.5vw, 7rem)', fontWeight: 400, letterSpacing: '-0.02em' }}
+                style={{ color: '#1b1c19', fontSize: 'clamp(4.5rem, 8.5vw, 8rem)', fontWeight: 400, letterSpacing: '-0.03em' }}
               >
                 Heat kills.
               </span>
@@ -268,11 +153,12 @@ export default function Home({ currentTemp }) {
               <span
                 className="font-fraunces"
                 style={{
-                  color: '#af101a',
-                  fontSize: 'clamp(4rem, 7.5vw, 7rem)',
+                  color: '#8a1524',
+                  fontSize: 'clamp(4.5rem, 8.5vw, 8rem)',
                   fontStyle: 'italic',
                   fontWeight: 400,
                   letterSpacing: '-0.02em',
+                  whiteSpace: 'nowrap'
                 }}
               >
                 HeatSafe protects.
@@ -281,42 +167,57 @@ export default function Home({ currentTemp }) {
 
             {/* Tagline */}
             <p
-              className="reveal font-outfit"
-              style={{ color: 'rgba(27,28,25,0.6)', fontSize: '1.25rem', fontWeight: 400, lineHeight: 1.65, maxWidth: '540px', margin: '0 0 2.5rem' }}
+              className="reveal font-inter"
+              style={{ color: '#1b1c19', fontSize: '1.15rem', fontWeight: 400, lineHeight: 1.5, maxWidth: '480px', margin: '0 0 3rem' }}
             >
               An early-warning public health system designed to protect elderly residents during extreme heat events.
             </p>
 
             {/* CTAs */}
             <div className="reveal flex items-center gap-4">
-              <Link
-                href="/onboarding"
-                className="btn-primary font-outfit font-semibold text-[0.85rem]"
-                style={{ background: '#af101a', color: '#fff', padding: '0.95rem 2rem', borderRadius: '100px', textDecoration: 'none' }}
+              <button
+                onClick={() => router.push('/onboarding')}
+                className="font-inter font-medium text-[0.9rem]"
+                style={{ background: '#8a1524', color: '#fff', padding: '1rem 2.25rem', borderRadius: '100px', border: 'none', cursor: 'pointer' }}
               >
                 Register someone at risk
-              </Link>
-              <Link
-                href="/city"
-                className="btn-secondary font-outfit font-semibold text-[0.85rem]"
-                style={{ background: 'transparent', color: '#1b1c19', padding: '0.95rem 2rem', borderRadius: '100px', textDecoration: 'none', border: '1px solid rgba(27,28,25,0.25)' }}
+              </button>
+              <button
+                onClick={() => router.push('/city')}
+                className="font-inter font-medium text-[0.9rem]"
+                style={{ background: 'transparent', color: '#1b1c19', padding: '1rem 2.25rem', borderRadius: '100px', border: '1px solid #1b1c19', cursor: 'pointer' }}
               >
                 Explore city dashboard
-              </Link>
+              </button>
             </div>
           </div>
 
-          {/* Right Content (Globe) */}
+          {/* Right Content (Static Globe Image) */}
           <div style={{
             position: 'absolute',
             right: '-5vw',
             top: '50%',
             transform: 'translateY(-50%)',
-            width: 'min(85vw, 1200px)',
+            width: '60vw',
             height: '110vh',
             pointerEvents: 'none',
+            overflow: 'hidden',
+            maskImage: 'radial-gradient(ellipse 85% 80% at 70% 50%, black 40%, transparent 100%)',
+            WebkitMaskImage: 'radial-gradient(ellipse 85% 80% at 70% 50%, black 40%, transparent 100%)',
           }}>
-            <ThermalGlobe />
+            <img
+              src="/heatsafe_landing_page_redesign.png"
+              alt="Thermal globe showing global heat patterns"
+              style={{
+                position: 'absolute',
+                right: 0,
+                top: '55%',
+                transform: 'translateY(-50%)',
+                height: '115%',
+                width: 'auto',
+                maxWidth: 'none',
+              }}
+            />
           </div>
         </section>
 
@@ -374,7 +275,7 @@ export default function Home({ currentTemp }) {
         </section>
 
         {/* ── How It Works ─────────────────────────────────────────────────── */}
-        <section id="how-it-works" style={{ background: '#fff', padding: '10rem 2rem' }}>
+        <section id="how-it-works" style={{ background: '#fbf9f4', padding: '10rem 2rem' }}>
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-end mb-20">
               <h2
@@ -457,7 +358,7 @@ export default function Home({ currentTemp }) {
           <div className="max-w-7xl mx-auto flex items-start justify-between">
             <div>
               <p className="font-newsreader font-bold text-[#af101a] text-xl mb-2">HeatSafe</p>
-              <p className="font-inter text-sm text-[#1b1c19]/40">© 2024 HeatSafe Public Health.</p>
+              <p className="font-inter text-sm text-[#1b1c19]/40">© 2026 HeatSafe Public Health.</p>
             </div>
             <div className="flex items-center gap-8">
               {['Dashboard', 'City', 'Enterprise', 'Register'].map(label => (
@@ -491,21 +392,3 @@ export default function Home({ currentTemp }) {
   )
 }
 
-export async function getServerSideProps() {
-  try {
-    const res = await fetch(
-      'https://api.open-meteo.com/v1/forecast' +
-        '?latitude=37.38&longitude=-5.97' +
-        '&hourly=temperature_2m' +
-        '&timezone=Europe%2FMadrid' +
-        '&forecast_days=1'
-    )
-    if (!res.ok) throw new Error('Open-Meteo error')
-    const data = await res.json()
-    const hour = new Date().getHours()
-    const temp = Math.round(data.hourly.temperature_2m[hour])
-    return { props: { currentTemp: temp } }
-  } catch {
-    return { props: { currentTemp: 25 } }
-  }
-}
