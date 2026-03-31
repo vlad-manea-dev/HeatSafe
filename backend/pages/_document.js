@@ -13,7 +13,7 @@ export default function Document() {
         />
         {/* Dashboard / map page fonts */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Outfit:wght@400;500&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400;1,9..144,500;1,9..144,600;1,9..144,700&family=Outfit:wght@400;500;600&display=swap"
           rel="stylesheet"
         />
         <link

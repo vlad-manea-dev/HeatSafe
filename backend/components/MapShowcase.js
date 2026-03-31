@@ -17,13 +17,15 @@ const HEAT_LAYERS = [
 const PW = 280, PH = 560, PR = 44   // phone shell
 const SW = 264, SH = 536, SR = 36   // screen (8px side, 12px top/bottom inset)
 
-export default function MapShowcase() {
+export default function MapShowcase({ children }) {
   const outerRef   = useRef(null)  // 350vh scroll container
   const mapWrapRef = useRef(null)  // clipped wrapper: starts at screen shape → full vp
   const mapRef     = useRef(null)  // Leaflet mount
   const shellRef   = useRef(null)  // SVG phone frame, fades out
   const overlayRef = useRef(null)  // thermal layers, clips in
   const mapInst    = useRef(null)
+
+  const childrenRef = useRef(null)
 
   useEffect(() => {
     if (typeof window === 'undefined' || !mapRef.current) return
@@ -54,11 +56,15 @@ export default function MapShowcase() {
       // Clip map to iPhone screen shape initially
       const vw   = window.innerWidth
       const vh   = window.innerHeight
-      const iTop  = Math.round((vh - SH) / 2)
-      const iSide = Math.round((vw - SW) / 2)
+      
+      const iTop   = Math.round((vh - SH) / 2)
+      const centerX = vw * 0.8 // Move to the right
+      const iLeft  = Math.round(centerX - SW / 2)
+      const iRight = Math.round(vw - (centerX + SW / 2))
+      const iBottom = vh - (iTop + SH)
 
       gsap.set(mapWrapRef.current, {
-        clipPath: `inset(${iTop}px ${iSide}px ${iTop}px ${iSide}px round ${SR}px)`,
+        clipPath: `inset(${iTop}px ${iRight}px ${iBottom}px ${iLeft}px round ${SR}px)`,
       })
 
       const tl = gsap.timeline({
@@ -70,7 +76,7 @@ export default function MapShowcase() {
         },
       })
 
-      // 0 → 0.45: clip expands, phone shell fades out
+      // 0 → 0.45: clip expands, phone shell fades out, children fade out, background darkens
       tl.to(mapWrapRef.current, {
         clipPath: 'inset(0px 0px 0px 0px round 0px)',
         ease:     'power2.inOut',
@@ -79,8 +85,21 @@ export default function MapShowcase() {
 
       tl.to(shellRef.current, {
         opacity:  0,
+        x:        -100, // Slight movement to the left as it fades
         ease:     'power2.out',
         duration: 0.3,
+      }, 0)
+
+      tl.to(childrenRef.current, {
+        opacity: 0,
+        y: -50,
+        ease: 'power2.inOut',
+        duration: 0.35
+      }, 0)
+
+      tl.to(outerRef.current.querySelector('.sticky-container'), {
+        backgroundColor: '#0e0e0e',
+        duration: 0.45
       }, 0)
 
       // 0.45 → 1.0: thermal overlay clips in
@@ -100,11 +119,12 @@ export default function MapShowcase() {
   return (
     <div ref={outerRef} style={{ height: '350vh', position: 'relative' }}>
       <div
+        className="sticky-container"
         style={{
           position:   'sticky',
           top:        0,
           height:     '100vh',
-          background: '#0e0e0e',
+          background: '#fbf9f4',
           overflow:   'hidden',
         }}
       >
@@ -136,6 +156,11 @@ export default function MapShowcase() {
           </div>
         </div>
 
+        {/* Children (e.g. Hero content) */}
+        <div ref={childrenRef} style={{ position: 'relative', zIndex: 20 }}>
+          {children}
+        </div>
+
         {/* Phone frame SVG — body is opaque, screen is transparent (cut out by mask) */}
         <svg
           ref={shellRef}
@@ -145,7 +170,7 @@ export default function MapShowcase() {
           style={{
             position:      'absolute',
             top:           '50%',
-            left:          '50%',
+            left:          '80%',
             transform:     'translate(-50%, -50%)',
             pointerEvents: 'none',
             zIndex:        10,

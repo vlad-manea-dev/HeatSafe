@@ -27,13 +27,66 @@
   .font-inter {
     font-family: 'Inter', system-ui, sans-serif;
   }
+
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .font-fraunces {
+    font-family: 'Fraunces', Georgia, serif;
+  }
+
+  .font-outfit {
+    font-family: 'Outfit', system-ui, sans-serif;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Paper texture overlay */
+  .paper-texture::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    opacity: 0.035;
+    pointer-events: none;
+    z-index: 9999;
+    background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+  }
+
+  .precision-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(27, 28, 25, 0.08);
+    border-radius: 4px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+  }
+
+  .btn-primary {
+    @apply transition-all duration-300;
+    box-shadow: 0 10px 25px -5px rgba(175, 16, 26, 0.3);
+  }
+  .btn-primary:hover {
+    @apply -translate-y-0.5;
+    box-shadow: 0 20px 30px -10px rgba(175, 16, 26, 0.4);
+  }
+
+  .btn-secondary {
+    @apply transition-all duration-300;
+  }
+  .btn-secondary:hover {
+    @apply border-[#1b1c19] text-[#1b1c19] bg-white/50;
+  }
 }
 
-@keyframes pulse-ring {
-  0%   { transform: scale(1);   opacity: 0.5; }
-  70%  { transform: scale(2.2); opacity: 0; }
-  100% { transform: scale(1);   opacity: 0; }
-}
 
 .pulse-ring {
   animation: pulse-ring 2s ease-out infinite;
