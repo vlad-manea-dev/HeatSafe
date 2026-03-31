@@ -119,6 +119,8 @@ export default function CityMapClient() {
     })
 
     const surface = new HeatSurface()
+    surface.addTo(heatSurfaceLayer)   // surface lives inside the group
+    map.removeLayer(heatSurfaceLayer) // hidden by default (surfaceVisible = false)
     heatSurfaceRef.current = surface
 
     return () => {

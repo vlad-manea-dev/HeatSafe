@@ -7,6 +7,17 @@ const heatZones = heatZonesByCity['sevilla']
 export default async function handler(req, res) {
   const { id } = req.query
 
+  if (req.method === 'DELETE') {
+    try {
+      await supabase.from('medications').delete().eq('person_id', id)
+      const { error } = await supabase.from('people').delete().eq('id', id)
+      if (error) throw error
+      return res.status(200).json({ success: true })
+    } catch (err) {
+      return res.status(500).json({ error: 'Failed to delete person' })
+    }
+  }
+
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' })
   }

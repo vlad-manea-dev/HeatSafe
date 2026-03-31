@@ -23,6 +23,7 @@ export default function DashboardList() {
   const [currentTemp, setCurrentTemp] = useState('--')
   const [sortOrder, setSortOrder] = useState('Risk Level')
   const [error, setError] = useState(false)
+  const [deleting, setDeleting] = useState(null)
 
   useEffect(() => {
     fetchPeople()
@@ -34,6 +35,18 @@ export default function DashboardList() {
       })
       .catch(() => setError(true))
   }, [sortOrder])
+
+  const handleDelete = async (e, id) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!confirm('Remove this person from monitoring?')) return
+    setDeleting(id)
+    try {
+      await fetch(`/api/people/${id}`, { method: 'DELETE' })
+      setPeople((prev) => prev.filter((p) => p.id !== id))
+    } catch (_) {}
+    setDeleting(null)
+  }
 
   return (
     <>
@@ -92,15 +105,26 @@ export default function DashboardList() {
                     className={`group block bg-white rounded-lg p-6 shadow-soft border border-transparent ${c.border} hover:-translate-y-1 transition-all duration-300 relative overflow-hidden focus:outline-none focus:ring-2 ${c.ring} focus:ring-offset-2`}
                   >
                     <div className="flex justify-between items-start mb-4">
-                      <div>
+                      <div className="flex-1 min-w-0 pr-2">
                         <h3 className="text-2xl font-display text-text font-semibold mb-1">{p.name}</h3>
                         <p className="text-muted text-base flex items-center gap-1">
                           <span className="material-symbols-outlined text-[18px]">location_on</span>
                           {p.address}
                         </p>
                       </div>
-                      <div className={`flex flex-col items-center justify-center size-14 rounded-full ${c.bg} text-white shadow-md`}>
-                        <span className="text-xl font-bold leading-none">{p.score}</span>
+                      <div className="flex flex-col items-center gap-2">
+                        <div className={`flex flex-col items-center justify-center size-14 rounded-full ${c.bg} text-white shadow-md`}>
+                          <span className="text-xl font-bold leading-none">{p.score}</span>
+                        </div>
+                        <button
+                          onClick={(e) => handleDelete(e, p.id)}
+                          disabled={deleting === p.id}
+                          className="flex items-center gap-1 text-xs font-medium text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors px-2 py-1 rounded-md border border-red-200 hover:border-red-400"
+                          title="Remove from monitoring"
+                        >
+                          <span className="material-symbols-outlined text-[14px]">delete</span>
+                          {deleting === p.id ? '…' : 'Delete'}
+                        </button>
                       </div>
                     </div>
                     <div className="mt-6 pt-4 border-t border-border">
