@@ -113,6 +113,39 @@ const mockAlerts = {
     carer_alert:
       "HeatSafe: Antonio López's risk score is 72/100 today. He has limited mobility and diabetes. Please check he has water and food within reach.",
   },
+
+  '01b8996e-5f08-4fd4-ba85-24746cce93d4': {
+    // Callum — HIGH RISK (4th floor, south-facing, lives alone, beta-blockers)
+    alerts: [
+      {
+        time: '08:00',
+        message:
+          'Good morning Callum. Seville will hit 38°C today. Your beta-blocker reduces your heart rate response to heat — avoid all strenuous activity.',
+      },
+      {
+        time: '11:00',
+        message:
+          'Temperature rising to 33°C. Your 4th floor south-facing flat is already heating up. Close all shutters and drink a full glass of water now.',
+      },
+      {
+        time: '13:30',
+        message:
+          'Peak heat: 38°C. Your flat could reach 43°C+ inside. Move to the coolest room. Do not go outside until after 7pm.',
+      },
+      {
+        time: '16:00',
+        message:
+          'Still 36°C. Place a damp towel on your neck and wrists. If you feel dizzy or your heart races, call 112 immediately.',
+      },
+      {
+        time: '19:00',
+        message:
+          'Cooling to 31°C. You can open windows for ventilation now. Well done staying safe today, Callum.',
+      },
+    ],
+    carer_alert:
+      "HeatSafe: Callum's risk score is 78/100 today. He is alone on a 4th floor south-facing flat in Seville (38°C peak). Please check in this afternoon.",
+  },
 }
 
 module.exports = { mockAlerts }

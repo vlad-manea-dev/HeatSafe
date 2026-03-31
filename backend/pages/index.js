@@ -106,9 +106,9 @@ export default function Home() {
           </Link>
 
           <div className="hidden md:flex items-center gap-4">
-            <Link href="/dashboard" className="font-outfit font-medium text-[1rem] text-[#1b1c19] hover:opacity-60 transition-opacity px-4 py-1">Solutions</Link>
-            <Link href="/city" className="font-outfit font-medium text-[1rem] text-[#1b1c19] hover:opacity-60 transition-opacity px-4 py-1">Data</Link>
-            <Link href="#how-it-works" className="font-outfit font-medium text-[1rem] text-[#1b1c19] hover:opacity-60 transition-opacity px-4 py-1">About</Link>
+            <Link href="/dashboard" className="font-outfit font-medium text-[1rem] text-[#1b1c19] hover:opacity-60 transition-opacity px-4 py-1">Dashboard</Link>
+            <Link href="/city" className="font-outfit font-medium text-[1rem] text-[#1b1c19] hover:opacity-60 transition-opacity px-4 py-1">Heat Map</Link>
+            <Link href="#how-it-works" className="font-outfit font-medium text-[1rem] text-[#1b1c19] hover:opacity-60 transition-opacity px-4 py-1">How It Works</Link>
           </div>
 
           <div className="flex items-center">
@@ -237,40 +237,64 @@ export default function Home() {
         {/* ── SMS Preview ──────────────────────────────────────────────────── */}
         <section style={{ background: '#fbf9f4', padding: '10rem 2rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div className="flex flex-col items-center max-w-2xl text-center mb-16">
-            <span className="font-inter text-[10px] font-bold tracking-[0.3em] uppercase text-[#af101a] mb-6">Patient Communication</span>
+            <span className="font-inter text-[10px] font-bold tracking-[0.3em] uppercase text-[#8a1524] mb-6">Patient Communication</span>
             <h2 className="font-newsreader text-[2.5rem] md:text-[3.5rem] leading-[1.1] text-[#1b1c19] mb-6">Personalised heat protocols.</h2>
-            <p className="font-inter text-[#1b1c19]/40 text-lg">Delivering actionable advice to the right person at the right time.</p>
+            <p className="font-inter text-[#1b1c19]/60 text-lg">Delivering actionable advice to the right person at the right time.</p>
           </div>
 
           <div style={{ position: 'relative' }}>
-            <div 
-              style={{ 
-                maxWidth: 420, 
-                background: 'rgba(255, 255, 255, 0.8)', 
-                backdropFilter: 'blur(20px)',
-                borderRadius: '24px', 
-                padding: '1.75rem',
-                border: '1px solid rgba(0,0,0,0.05)',
-                boxShadow: '0 30px 60px -12px rgba(0,0,0,0.1)'
+            {/* Phone Frame */}
+            <div
+              style={{
+                width: 320,
+                height: 650,
+                background: '#fff',
+                borderRadius: '40px',
+                border: '12px solid #1b1c19',
+                boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                position: 'relative'
               }}
             >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 rounded-full bg-[#af101a] flex items-center justify-center">
-                  <IconFlame className="w-4 h-4 text-white" />
-                </div>
-                <div>
-                  <p className="font-inter font-bold text-[0.75rem] text-[#1b1c19]">HeatSafe Alert</p>
-                  <p className="font-inter text-[0.65rem] text-[#1b1c19]/40">Today at 7:02 AM</p>
-                </div>
+              {/* Phone Notch/Island */}
+              <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 100, height: 25, background: '#1b1c19', borderBottomLeftRadius: 16, borderBottomRightRadius: 16, zIndex: 10 }} />
+              
+              {/* Phone screen background */}
+              <div style={{ flex: 1, background: '#f8f6f0', position: 'relative', padding: '1rem', paddingTop: '4rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                 
+                 {/* SMS Notification */}
+                 <div 
+                   style={{ 
+                     background: 'rgba(255, 255, 255, 0.95)', 
+                     backdropFilter: 'blur(20px)',
+                     borderRadius: '24px', 
+                     padding: '1.25rem',
+                     boxShadow: '0 10px 30px -5px rgba(0,0,0,0.08)',
+                     border: '1px solid rgba(0,0,0,0.04)'
+                   }}
+                 >
+                   <div className="flex items-center gap-3 mb-3">
+                     <div className="w-8 h-8 rounded-full bg-[#8a1524] flex items-center justify-center">
+                       <IconFlame className="w-4 h-4 text-white" />
+                     </div>
+                     <div>
+                       <p className="font-inter font-bold text-[0.8rem] text-[#1b1c19]">HeatSafe Alert</p>
+                       <p className="font-inter text-[0.7rem] text-[#1b1c19]/50">Today at 7:02 AM</p>
+                     </div>
+                   </div>
+                   <p className="font-inter text-[0.9rem] text-[#1b1c19]/80" style={{ lineHeight: 1.5, margin: 0 }}>
+                     ⚠️ Good morning Mary. Today&apos;s peak in Seville is 41°C.
+                     Your furosemide increases dehydration risk — drink water every
+                     30 min and stay indoors 12–4pm.
+                   </p>
+                 </div>
               </div>
-              <p className="font-inter text-[0.95rem] text-[#1b1c19]/80" style={{ lineHeight: 1.6, margin: 0 }}>
-                ⚠️ Good morning Mary. Today&apos;s peak in Dublin is 34°C.
-                Your furosemide increases dehydration risk — drink water every
-                30 min and stay indoors 12–4pm.
-              </p>
             </div>
-            {/* Decorative element */}
-            <div style={{ position: 'absolute', top: -20, right: -20, width: 60, height: 60, background: '#af101a', opacity: 0.03, borderRadius: '50%', zIndex: -1 }} />
+            
+            {/* Decorative background glow behind phone */}
+            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '120%', height: '80%', background: 'radial-gradient(circle, rgba(138,21,36,0.05) 0%, rgba(251,249,244,0) 70%)', zIndex: -1, pointerEvents: 'none' }} />
           </div>
         </section>
 

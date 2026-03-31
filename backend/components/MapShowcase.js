@@ -2,16 +2,26 @@ import { useEffect, useRef } from 'react'
 import 'leaflet/dist/leaflet.css'
 
 const HEAT_LAYERS = [
-  'radial-gradient(ellipse 95% 85% at 50% 50%, rgba(100,0,0,0.42) 0%, rgba(60,0,0,0.14) 75%, transparent 100%)',
-  'radial-gradient(ellipse 28% 22% at 50% 46%, rgba(210,22,0,0.62) 0%, rgba(145,0,0,0.32) 65%, transparent 100%)',
-  'radial-gradient(ellipse 20% 17% at 45% 33%, rgba(195,30,0,0.55) 0%, rgba(130,0,0,0.27) 65%, transparent 100%)',
-  'radial-gradient(ellipse 18% 14% at 64% 51%, rgba(200,25,0,0.52) 0%, rgba(138,0,0,0.25) 65%, transparent 100%)',
-  'radial-gradient(ellipse 16% 13% at 42% 63%, rgba(185,18,0,0.46) 0%, rgba(122,0,0,0.22) 65%, transparent 100%)',
-  'radial-gradient(circle 9% at 51% 44%, rgba(255,145,0,0.80) 0%, rgba(235,48,0,0.52) 42%, transparent 100%)',
-  'radial-gradient(circle 7% at 46% 36%, rgba(255,125,0,0.74) 0%, rgba(225,38,0,0.46) 42%, transparent 100%)',
-  'radial-gradient(circle 6% at 63% 50%, rgba(255,108,0,0.68) 0%, rgba(215,32,0,0.40) 42%, transparent 100%)',
-  'radial-gradient(circle 5% at 44% 62%, rgba(255,95,0,0.62) 0%, rgba(205,28,0,0.36) 42%, transparent 100%)',
+  // Base warm wash
+  'radial-gradient(ellipse 90% 80% at 50% 50%, rgba(180,60,0,0.35) 0%, rgba(120,30,0,0.12) 75%, transparent 100%)',
+  // Large orange mid-zone
+  'radial-gradient(ellipse 55% 45% at 52% 48%, rgba(255,120,0,0.45) 0%, rgba(220,70,0,0.20) 60%, transparent 100%)',
+  // Red hotspot — centre
+  'radial-gradient(circle 14% at 51% 44%, rgba(220,30,0,0.75) 0%, rgba(200,60,0,0.40) 50%, transparent 100%)',
+  // Red hotspot — upper left
+  'radial-gradient(circle 10% at 44% 34%, rgba(210,25,0,0.65) 0%, rgba(185,50,0,0.30) 55%, transparent 100%)',
+  // Orange zone — right
+  'radial-gradient(ellipse 22% 18% at 65% 52%, rgba(255,100,0,0.55) 0%, rgba(230,70,0,0.25) 60%, transparent 100%)',
+  // Yellow hotspot — lower centre
+  'radial-gradient(circle 8% at 48% 62%, rgba(255,210,0,0.72) 0%, rgba(255,150,0,0.40) 50%, transparent 100%)',
+  // Yellow-orange zone — upper right
+  'radial-gradient(circle 7% at 60% 38%, rgba(255,190,0,0.60) 0%, rgba(255,130,0,0.30) 55%, transparent 100%)',
+  // Bright yellow core accent
+  'radial-gradient(circle 5% at 50% 43%, rgba(255,240,80,0.55) 0%, rgba(255,180,0,0.25) 50%, transparent 100%)',
+  // Soft orange fringe — bottom left
+  'radial-gradient(ellipse 18% 14% at 40% 64%, rgba(255,140,0,0.42) 0%, rgba(220,80,0,0.18) 60%, transparent 100%)',
 ]
+
 
 // Phone geometry
 const PW = 280, PH = 560, PR = 44   // phone shell
@@ -22,7 +32,8 @@ export default function MapShowcase({ children }) {
   const mapWrapRef = useRef(null)  // clipped wrapper: starts at screen shape → full vp
   const mapRef     = useRef(null)  // Leaflet mount
   const shellRef   = useRef(null)  // SVG phone frame, fades out
-  const overlayRef = useRef(null)  // thermal layers, clips in
+  // thermal layers, clips in
+  const overlayRef = useRef(null)
   const mapInst    = useRef(null)
 
   const childrenRef = useRef(null)
@@ -102,7 +113,7 @@ export default function MapShowcase({ children }) {
         duration: 0.45
       }, 0)
 
-      // 0.45 → 1.0: thermal overlay clips in
+      // 0.45 → 1.0: multicolour heat blobs clip in
       tl.fromTo(overlayRef.current,
         { clipPath: 'circle(0% at 50% 45%)' },
         { clipPath: 'circle(95% at 50% 45%)', ease: 'none', duration: 0.55 },
@@ -132,26 +143,13 @@ export default function MapShowcase({ children }) {
         <div ref={mapWrapRef} style={{ position: 'absolute', inset: 0 }}>
           <div ref={mapRef} style={{ position: 'absolute', inset: 0 }} />
 
-          {/* Thermal overlay */}
+          {/* Multicolour heat blob overlay */}
           <div
             ref={overlayRef}
-            style={{
-              position:      'absolute',
-              inset:         0,
-              clipPath:      'circle(0% at 50% 45%)',
-              pointerEvents: 'none',
-            }}
+            style={{ position: 'absolute', inset: 0, clipPath: 'circle(0% at 50% 45%)', pointerEvents: 'none' }}
           >
             {HEAT_LAYERS.map((bg, i) => (
-              <div
-                key={i}
-                style={{
-                  position:     'absolute',
-                  inset:        0,
-                  background:   bg,
-                  mixBlendMode: i === 0 ? 'normal' : 'screen',
-                }}
-              />
+              <div key={i} style={{ position: 'absolute', inset: 0, background: bg, mixBlendMode: i === 0 ? 'normal' : 'screen' }} />
             ))}
           </div>
         </div>

@@ -100,12 +100,12 @@ export default function EnterpriseMapClient() {
       })
       const marker = L.marker([site.lat, site.lng], { icon: goldIcon }).addTo(optimalLayer)
       marker.bindTooltip(`
-        <div class="p-3 w-64 bg-white rounded shadow-lg border border-border">
-          <div style="color:#4A7C59;font-weight:700;font-size:10px;text-transform:uppercase;margin-bottom:4px">Priority Site #${i + 1}</div>
-          <div style="font-family:'Fraunces',serif;font-weight:600;font-size:15px;margin-bottom:6px;color:#1b1c19">${site.name}</div>
-          <div style="font-size:11px;color:#8A8683;line-height:1.6">${site.reason}</div>
+        <div style="width:210px;padding:10px;background:#fff;border-radius:8px;border:1px solid #e5e0da;box-shadow:0 4px 12px rgba(0,0,0,0.1)">
+          <div style="color:#4A7C59;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Priority Site #${i + 1}</div>
+          <div style="font-weight:600;font-size:14px;line-height:1.3;margin-bottom:6px;color:#1b1c19;white-space:normal;word-break:break-word">${site.name}</div>
+          <div style="font-size:11px;color:#8A8683;line-height:1.5;white-space:normal;word-break:break-word">${site.reason}</div>
         </div>
-      `, { permanent: true, direction: 'top', className: 'hex-tooltip' })
+      `, { permanent: true, direction: 'top', className: 'hex-tooltip', maxWidth: 230 })
     })
     
     if (mapInstance.current) {
