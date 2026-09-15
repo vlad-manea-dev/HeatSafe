@@ -206,7 +206,10 @@ export default function Home() {
             transform: 'translateY(-50%)',
             width: '55vw',
             height: '110vh',
-            pointerEvents: 'none',
+            // The globe is draggable, so this must not swallow pointer events.
+            // The hero's left column sits at zIndex 10 and stays clickable where
+            // the two overlap.
+            pointerEvents: 'auto',
             overflow: 'hidden',
             maskImage: 'radial-gradient(ellipse 80% 75% at 65% 50%, black 30%, transparent 85%)',
             WebkitMaskImage: 'radial-gradient(ellipse 80% 75% at 65% 50%, black 30%, transparent 85%)',

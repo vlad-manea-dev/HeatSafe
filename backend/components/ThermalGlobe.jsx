@@ -92,9 +92,11 @@ export default function ThermalGlobe() {
     if (controls) {
       controls.autoRotate = true
       controls.autoRotateSpeed = 0.25
-      controls.enableZoom = true
-      controls.enablePan = true
+      // Drag to spin the globe, but leave the wheel to the page: this sits in a
+      // scroll-driven hero, and zoom-on-wheel would swallow the page scroll.
       controls.enableRotate = true
+      controls.enableZoom = false
+      controls.enablePan = false
     }
   }, [])
 
@@ -119,6 +121,7 @@ export default function ThermalGlobe() {
   return (
     <div
       ref={containerRef}
+      className="cursor-grab active:cursor-grabbing"
       style={{ width: "100%", height: "100%", position: "relative" }}
     >
       {webgl && dims.width > 0 && (
@@ -143,7 +146,7 @@ export default function ThermalGlobe() {
           polygonStrokeColor={() => "rgba(255, 255, 255, 0.45)"}
           polygonStrokeWidth={0.5}
           polygonAltitude={0.004}
-          enablePointerInteraction={false}
+          enablePointerInteraction={true}
         />
       )}
     </div>
