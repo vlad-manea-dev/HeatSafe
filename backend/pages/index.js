@@ -9,6 +9,12 @@ const MapShowcase = dynamic(
   () => import('../components/MapShowcase'),
   { ssr: false }
 )
+// WebGL globe — renders at device resolution, so it stays sharp on Retina
+// where the 650x768 globe.png was being upscaled ~2.8x.
+const ThermalGlobe = dynamic(
+  () => import('../components/ThermalGlobe'),
+  { ssr: false }
+)
 import ShutterSection from '../components/ShutterSection'
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
@@ -99,25 +105,25 @@ export default function Home() {
           }}
         >
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
-            <IconFlame className="w-6 h-6 text-[#af101a]" />
-            <span className="font-fraunces font-semibold text-[1.25rem] text-[#1b1c19] tracking-tight">
+            <IconFlame className="w-7 h-7 text-[#af101a]" />
+            <span className="font-fraunces font-semibold text-[1.5rem] text-[#1b1c19] tracking-tight">
               HeatSafe
             </span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-4">
-            <Link href="/dashboard" className="font-outfit font-medium text-[1rem] text-[#1b1c19] hover:opacity-60 transition-opacity px-4 py-1">Dashboard</Link>
-            <Link href="/city" className="font-outfit font-medium text-[1rem] text-[#1b1c19] hover:opacity-60 transition-opacity px-4 py-1">Heat Map</Link>
-            <Link href="#how-it-works" className="font-outfit font-medium text-[1rem] text-[#1b1c19] hover:opacity-60 transition-opacity px-4 py-1">How It Works</Link>
+          <div className="hidden md:flex items-center gap-6">
+            <Link href="/dashboard" className="font-outfit font-medium text-[1.1rem] text-[#1b1c19] hover:opacity-60 transition-opacity px-4 py-1">Dashboard</Link>
+            <Link href="/city" className="font-outfit font-medium text-[1.1rem] text-[#1b1c19] hover:opacity-60 transition-opacity px-4 py-1">Heat Map</Link>
+            <Link href="#how-it-works" className="font-outfit font-medium text-[1.1rem] text-[#1b1c19] hover:opacity-60 transition-opacity px-4 py-1">How It Works</Link>
           </div>
 
           <div className="flex items-center">
             <Link
               href="/dashboard"
-              className="font-outfit font-bold text-[1rem] text-white"
+              className="font-outfit font-bold text-[1.1rem] text-white"
               style={{
                 background: '#af101a',
-                padding: '0.75rem 2rem',
+                padding: '0.85rem 2.5rem',
                 borderRadius: '100px',
                 textDecoration: 'none',
               }}
@@ -145,7 +151,7 @@ export default function Home() {
             <h1 className="reveal" style={{ margin: '0 0 1.25rem', lineHeight: 0.95 }}>
               <span
                 className="font-fraunces"
-                style={{ color: '#1b1c19', fontSize: 'clamp(4.5rem, 8.5vw, 8rem)', fontWeight: 400, letterSpacing: '-0.03em' }}
+                style={{ color: '#1b1c19', fontSize: 'clamp(5rem, 9vw, 9rem)', fontWeight: 400, letterSpacing: '-0.03em' }}
               >
                 Heat kills.
               </span>
@@ -154,7 +160,7 @@ export default function Home() {
                 className="font-fraunces"
                 style={{
                   color: '#8a1524',
-                  fontSize: 'clamp(4.5rem, 8.5vw, 8rem)',
+                  fontSize: 'clamp(5rem, 9vw, 9rem)',
                   fontStyle: 'italic',
                   fontWeight: 400,
                   letterSpacing: '-0.02em',
@@ -168,7 +174,7 @@ export default function Home() {
             {/* Tagline */}
             <p
               className="reveal font-inter"
-              style={{ color: '#1b1c19', fontSize: '1.15rem', fontWeight: 400, lineHeight: 1.5, maxWidth: '480px', margin: '0 0 3rem' }}
+              style={{ color: '#1b1c19', fontSize: '1.3rem', fontWeight: 400, lineHeight: 1.55, maxWidth: '520px', margin: '0 0 3rem' }}
             >
               An early-warning public health system designed to protect elderly residents during extreme heat events.
             </p>
@@ -177,47 +183,35 @@ export default function Home() {
             <div className="reveal flex items-center gap-4">
               <button
                 onClick={() => router.push('/onboarding')}
-                className="font-inter font-medium text-[0.9rem]"
-                style={{ background: '#8a1524', color: '#fff', padding: '1rem 2.25rem', borderRadius: '100px', border: 'none', cursor: 'pointer' }}
+                className="font-inter font-medium text-[1.05rem]"
+                style={{ background: '#8a1524', color: '#fff', padding: '1.1rem 2.5rem', borderRadius: '100px', border: 'none', cursor: 'pointer' }}
               >
                 Register someone at risk
               </button>
               <button
                 onClick={() => router.push('/city')}
-                className="font-inter font-medium text-[0.9rem]"
-                style={{ background: 'transparent', color: '#1b1c19', padding: '1rem 2.25rem', borderRadius: '100px', border: '1px solid #1b1c19', cursor: 'pointer' }}
+                className="font-inter font-medium text-[1.05rem]"
+                style={{ background: 'transparent', color: '#1b1c19', padding: '1.1rem 2.5rem', borderRadius: '100px', border: '1px solid #1b1c19', cursor: 'pointer' }}
               >
                 Explore city dashboard
               </button>
             </div>
           </div>
 
-          {/* Right Content (Static Globe Image) */}
+          {/* Right Content (live WebGL thermal globe) */}
           <div style={{
             position: 'absolute',
             right: '-5vw',
             top: '50%',
             transform: 'translateY(-50%)',
-            width: '60vw',
+            width: '55vw',
             height: '110vh',
             pointerEvents: 'none',
             overflow: 'hidden',
-            maskImage: 'radial-gradient(ellipse 85% 80% at 70% 50%, black 40%, transparent 100%)',
-            WebkitMaskImage: 'radial-gradient(ellipse 85% 80% at 70% 50%, black 40%, transparent 100%)',
+            maskImage: 'radial-gradient(ellipse 80% 75% at 65% 50%, black 30%, transparent 85%)',
+            WebkitMaskImage: 'radial-gradient(ellipse 80% 75% at 65% 50%, black 30%, transparent 85%)',
           }}>
-            <img
-              src="/heatsafe_landing_page_redesign.png"
-              alt="Thermal globe showing global heat patterns"
-              style={{
-                position: 'absolute',
-                right: 0,
-                top: '55%',
-                transform: 'translateY(-50%)',
-                height: '115%',
-                width: 'auto',
-                maxWidth: 'none',
-              }}
-            />
+            <ThermalGlobe />
           </div>
         </section>
 
