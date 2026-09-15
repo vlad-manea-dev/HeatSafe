@@ -475,7 +475,7 @@ export default function Onboarding() {
               </div>
               {role === 'carer' && (
                 <div style={{ marginBottom: '28px' }}>
-                  <Input label="What is their first name?" placeholder="e.g. Mary" value={caredForName} onChange={(e) => setCaredForName(e.target.value)} />
+                  <Input label="What is their first name?" placeholder="e.g. María" value={caredForName} onChange={(e) => setCaredForName(e.target.value)} />
                 </div>
               )}
               <NavButtons onNext={() => { if (role && (role === 'self' || caredForName.trim())) goNext() }} nextDisabled={!role || (role === 'carer' && !caredForName.trim())} />
@@ -490,7 +490,7 @@ export default function Onboarding() {
                 sub={role === 'carer' ? `First, let's set up your account. Then we'll build ${caredForName}'s profile.` : 'Your details — used to send you alerts when it matters.'}
               />
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginBottom: '8px' }}>
-                <Input label="Your full name" placeholder="e.g. John Sullivan" value={account.name} onChange={(e) => setAccount((a) => ({ ...a, name: e.target.value }))} />
+                <Input label="Your full name" placeholder="e.g. Pablo Martínez" value={account.name} onChange={(e) => setAccount((a) => ({ ...a, name: e.target.value }))} />
                 <Input label="Email address" type="email" placeholder="you@example.com" value={account.email} onChange={(e) => setAccount((a) => ({ ...a, email: e.target.value }))} />
                 <Input label="Phone number" hint="We'll send alerts to this number" type="tel" placeholder="+34 600 000 000" value={account.phone} onChange={(e) => setAccount((a) => ({ ...a, phone: e.target.value }))} />
                 <Input label="Password" type="password" placeholder="Create a password" value={account.password} onChange={(e) => setAccount((a) => ({ ...a, password: e.target.value }))} />
@@ -607,7 +607,7 @@ export default function Onboarding() {
 
               {emergency.enabled && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginBottom: '8px' }}>
-                  <Input label="Contact name" placeholder="e.g. John Sullivan" value={emergency.name} onChange={(e) => setEmergency((em) => ({ ...em, name: e.target.value }))} />
+                  <Input label="Contact name" placeholder="e.g. Carmen Ruiz" value={emergency.name} onChange={(e) => setEmergency((em) => ({ ...em, name: e.target.value }))} />
                   <Input label="Contact phone number" type="tel" placeholder="+34 600 000 000" value={emergency.phone} onChange={(e) => setEmergency((em) => ({ ...em, phone: e.target.value }))} />
                   <Dropdown
                     label="Relationship"
@@ -633,8 +633,8 @@ function PageHead({ title }) {
     <Head>
       <title>{title}</title>
       <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
-      <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+      {/* Fonts are loaded once in _document.js — duplicating them via next/head
+          is redundant and triggers Next's no-stylesheets-in-head warning. */}
     </Head>
   )
 }

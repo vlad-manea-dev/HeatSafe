@@ -53,10 +53,12 @@ export default function ThermalBackground() {
 
     mapInstance.current = map
 
-    // CartoDB Positron — the clean minimal light-gray tile style
+    // Esri World Light Gray Canvas — clean minimal light-gray tiles, no API key.
+    // (CARTO's Positron now watermarks unauthenticated tiles with "API KEY REQUIRED".)
+    // Tiles only exist to z16; maxNativeZoom upscales beyond that instead of going blank.
     L.tileLayer(
-      'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-      { subdomains: 'abcd', maxZoom: 20 }
+      'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+      { attribution: 'Tiles &copy; Esri', maxZoom: 20, maxNativeZoom: 16 }
     ).addTo(map)
 
     setTimeout(() => map.invalidateSize(), 120)

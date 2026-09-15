@@ -66,7 +66,7 @@ export default function DashboardList() {
                     Monitoring {people.length} {people.length === 1 ? 'person' : 'people'}.
                   </h1>
                   <p className="text-muted text-lg font-normal leading-normal">
-                    Current Dublin baseline: <span className="font-medium text-text">{currentTemp}°C</span>
+                    Current Seville baseline: <span className="font-medium text-text">{currentTemp}°C</span>
                   </p>
                 </div>
                 <div className="flex">

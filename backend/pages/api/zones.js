@@ -25,6 +25,40 @@ async function fetchPoint(lat, lng) {
   }
 }
 
+// Open-Meteo is called once per zone (15 points per request). Without a cache a
+// few page refreshes trip their rate limit and every point starts 503-ing.
+const WEATHER_TTL_MS = 10 * 60 * 1000
+const weatherCache = new Map()
+
+// A single upstream 503 used to reject the whole Promise.all and blank the map.
+// Returning null instead lets each zone fall back to the baseline individually.
+async function safeFetchPoint(lat, lng) {
+  const key = `${lat.toFixed(3)},${lng.toFixed(3)}`
+  const hit = weatherCache.get(key)
+  if (hit && Date.now() - hit.at < WEATHER_TTL_MS) return hit.value
+
+  try {
+    const value = await fetchPoint(lat, lng)
+    weatherCache.set(key, { at: Date.now(), value })
+    return value
+  } catch (err) {
+    console.warn(`Open-Meteo failed for ${key}: ${err.message}`)
+    // Serve stale data rather than nothing if we have any.
+    return hit ? hit.value : null
+  }
+}
+
+// Last-resort shape so the UI (and its hour slider) still renders if every
+// upstream call fails. Deliberately plausible-but-flat, not a real forecast.
+const FALLBACK_BASELINE = {
+  currentTemp: 30,
+  peakTemp: 36,
+  hourly: Array.from({ length: 24 }, (_, h) => ({
+    time: String(h).padStart(2, '0') + ':00',
+    temp: Math.round((26 + 10 * Math.max(0, Math.sin(((h - 6) / 24) * 2 * Math.PI))) * 10) / 10,
+  })),
+}
+
 // In-memory cache — persists for the lifetime of the server process.
 const osmCache = new Map()
 
@@ -88,15 +122,18 @@ export default async function handler(req, res) {
 
   try {
     // Fetch baseline + zone temperatures + OSM boundaries in parallel
-    const [baseline, ...rest] = await Promise.all([
-      fetchPoint(centroid.lat, centroid.lng),
-      ...cityZones.map((z) => fetchPoint(z.centroid.lat, z.centroid.lng)),
+    const [rawBaseline, ...rest] = await Promise.all([
+      safeFetchPoint(centroid.lat, centroid.lng),
+      ...cityZones.map((z) => safeFetchPoint(z.centroid.lat, z.centroid.lng)),
       ...cityZones.map((z) => fetchOsmBoundary(z.nominatimQuery)),
     ])
 
     const zoneCount = cityZones.length
     const zoneTemps = rest.slice(0, zoneCount)
     const zoneCoords = rest.slice(zoneCount)
+
+    // Prefer the city centroid, then any zone that did resolve, then the stub.
+    const baseline = rawBaseline || zoneTemps.find(Boolean) || FALLBACK_BASELINE
 
     const zones = cityZones.map((z, i) => {
       const liveTemp = zoneTemps[i] || { currentTemp: baseline.currentTemp + z.offset, peakTemp: baseline.peakTemp + z.offset }

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import 'leaflet/dist/leaflet.css'
+import { drawHeatField, makeZoneFalloff } from '../lib/heatSurface'
 import NavBar from './NavBar'
 
 export default function CityMapClient() {
@@ -12,6 +13,9 @@ export default function CityMapClient() {
   const layersRef = useRef({})
   const heatSurfaceRef = useRef(null)
   const optimizerLayerRef = useRef(null)
+  // The heat surface is built once in a mount effect, so its _draw closure would
+  // capture a stale currentHour. A ref keeps it reading the live slider value.
+  const currentHourRef = useRef(new Date().getHours())
 
   const [city, setCity] = useState('sevilla')
   const [currentHour, setCurrentHour] = useState(new Date().getHours())
@@ -56,6 +60,15 @@ export default function CityMapClient() {
     if (temp >= 26) return '#F2C57C'
     return '#EDD9A3'
   }
+  // Same ramp as tempToColor, but semi-transparent so the basemap reads through.
+  function tempToRGBA(temp) {
+    if (temp >= 42) return [217, 56, 58, 150]
+    if (temp >= 38) return [224, 85, 69, 145]
+    if (temp >= 34) return [231, 111, 81, 140]
+    if (temp >= 30) return [244, 162, 97, 132]
+    if (temp >= 26) return [242, 197, 124, 122]
+    return [237, 217, 163, 110]
+  }
   function offsetIcon(offset) { return offset > 0 ? '🔥' : '❄️' }
 
   // Init map once
@@ -66,9 +79,9 @@ export default function CityMapClient() {
     const map = L.map(mapRef.current, { zoomControl: false }).setView([37.385, -5.990], 13)
     mapInstance.current = map
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-      subdomains: 'abcd', maxZoom: 19,
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri',
+      maxZoom: 19, maxNativeZoom: 16,
     }).addTo(map)
 
     const zoneLayer = L.layerGroup().addTo(map)
@@ -101,20 +114,18 @@ export default function CityMapClient() {
       },
       _draw() {
         const data = allDataRef.current
-        if (!data || !data.zones) return
-        const ctx = this._container.getContext('2d')
-        const size = mapInstance.current.getSize()
-        ctx.clearRect(0, 0, size.x, size.y)
-        const step = 25
-        const hour = typeof window !== 'undefined' ? parseInt(document.getElementById('city-hour-ref')?.value || new Date().getHours()) : 12
-        for (let x = 0; x < size.x; x += step) {
-          for (let y = 0; y < size.y; y += step) {
-            const ll = mapInstance.current.containerPointToLatLng([x + step / 2, y + step / 2])
-            const temp = getTempAt(ll.lat, ll.lng, hour)
-            ctx.fillStyle = tempToColor(temp)
-            ctx.fillRect(x, y, step, step)
-          }
-        }
+        if (!data || !data.zones || !mapInstance.current) return
+        const map = mapInstance.current
+        const size = map.getSize()
+        const hour = currentHourRef.current
+        drawHeatField(this._container.getContext('2d'), {
+          width: size.x,
+          height: size.y,
+          toLatLng: (x, y) => map.containerPointToLatLng([x, y]),
+          tempAt: (lat, lng) => getTempAt(lat, lng, hour),
+          colorFor: tempToRGBA,
+          falloff: makeZoneFalloff(data.zones),
+        })
       },
     })
 
@@ -231,6 +242,7 @@ export default function CityMapClient() {
 
   const handleHourChange = (h) => {
     setCurrentHour(h)
+    currentHourRef.current = h
     updateVisuals(h)
   }
 
@@ -346,7 +358,7 @@ export default function CityMapClient() {
       {/* Map + Sidebar */}
       <main className="flex-1 relative flex overflow-hidden">
         {/* Sidebar */}
-        <aside className="absolute left-6 top-6 bottom-6 w-[320px] bg-white rounded-lg shadow-floating z-40 flex flex-col overflow-hidden border border-border">
+        <aside className="absolute z-40 bg-white shadow-floating flex flex-col overflow-hidden border border-border left-3 right-3 bottom-3 max-h-[46vh] rounded-xl md:left-6 md:right-auto md:top-6 md:bottom-6 md:w-[320px] md:max-h-none md:rounded-lg">
           <div className="p-6 border-b border-border">
             <div className="flex items-center justify-between mb-2">
               <h1 className="font-display text-2xl font-semibold">City Distribution</h1>

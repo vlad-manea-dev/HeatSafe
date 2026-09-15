@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import 'leaflet/dist/leaflet.css'
 import NavBar from './NavBar'
+import { drawHeatField, makeZoneFalloff } from '../lib/heatSurface'
 
 export default function EnterpriseMapClient() {
   const mapRef = useRef(null)
@@ -47,12 +48,13 @@ export default function EnterpriseMapClient() {
     return den === 0 ? baseTemp : num / den
   }
 
-  function tempToColor(temp) {
-    if (temp >= 40) return 'rgba(153, 27, 27, 0.75)'
-    if (temp >= 37) return 'rgba(220, 38, 38, 0.65)'
-    if (temp >= 34) return 'rgba(234, 88, 12, 0.6)'
-    if (temp >= 30) return 'rgba(251, 191, 36, 0.55)'
-    return 'rgba(21, 128, 61, 0.45)'
+  // Heat palette as [r,g,b,alpha0-255] for the interpolated canvas field.
+  function tempToRGBA(temp) {
+    if (temp >= 40) return [153, 27, 27, 191]
+    if (temp >= 37) return [220, 38, 38, 166]
+    if (temp >= 34) return [234, 88, 12, 153]
+    if (temp >= 30) return [251, 191, 36, 140]
+    return [21, 128, 61, 115]
   }
 
   function redrawHeatSurface() {
@@ -121,8 +123,8 @@ export default function EnterpriseMapClient() {
     const map = L.map(mapRef.current, { zoomControl: false }).setView([37.385, -5.990], 13)
     mapInstance.current = map
 
-    const light = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; CARTO', subdomains: 'abcd', maxZoom: 19,
+    const light = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri', maxZoom: 19, maxNativeZoom: 16,
     }).addTo(map)
     const sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       attribution: 'Tiles &copy; Esri', maxZoom: 19,
@@ -158,19 +160,20 @@ export default function EnterpriseMapClient() {
         this._draw()
       },
       _draw() {
-        if (!allDataRef.current || !mapInstance.current) return
-        const ctx = this._container.getContext('2d')
-        const size = mapInstance.current.getSize()
-        ctx.clearRect(0, 0, size.x, size.y)
-        const step = 45
-        for (let x = 0; x < size.x; x += step) {
-          for (let y = 0; y < size.y; y += step) {
-            const ll = mapInstance.current.containerPointToLatLng([x + step / 2, y + step / 2])
-            const temp = getTempAt(ll.lat, ll.lng, currentHour)
-            ctx.fillStyle = tempToColor(temp)
-            ctx.fillRect(x, y, step, step)
-          }
-        }
+        const data = allDataRef.current
+        if (!data || !mapInstance.current) return
+        const map = mapInstance.current
+        const size = map.getSize()
+        // Virtual parks are heat sources too, so they extend the surface.
+        const falloff = makeZoneFalloff([...(data.zones || []), ...virtualNodesRef.current])
+        drawHeatField(this._container.getContext('2d'), {
+          width: size.x,
+          height: size.y,
+          toLatLng: (x, y) => map.containerPointToLatLng([x, y]),
+          tempAt: (lat, lng) => getTempAt(lat, lng, currentHour),
+          colorFor: tempToRGBA,
+          falloff,
+        })
       },
     })
 
@@ -291,7 +294,7 @@ export default function EnterpriseMapClient() {
       <NavBar activePage="enterprise" mode="enterprise" />
 
       <main className="flex-1 relative flex overflow-hidden">
-        <aside className="absolute left-6 top-6 bottom-6 w-[360px] bg-white rounded-lg shadow-floating z-40 flex flex-col overflow-hidden border border-border">
+        <aside className="absolute z-40 bg-white shadow-floating flex flex-col overflow-hidden border border-border left-3 right-3 bottom-3 max-h-[46vh] rounded-xl md:left-6 md:right-auto md:top-6 md:bottom-6 md:w-[360px] md:max-h-none md:rounded-lg">
           <div className="p-6 border-b border-border">
             <div className="flex items-center justify-between mb-2">
               <h1 className="font-display text-2xl font-semibold">Urban Planning</h1>
